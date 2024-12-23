@@ -6,7 +6,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ../../fourseven_oneseven/dist:/usr/share/nginx/html
+      - ../../fourseven_oneseven_frontend/dist:/usr/share/nginx/html
       - ../nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - web_network
