@@ -74,6 +74,3 @@ services:
 networks:
   web_network:
     driver: bridge
-
-volumes:
-  frontend_dist:
