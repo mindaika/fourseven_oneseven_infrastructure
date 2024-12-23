@@ -7,9 +7,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - type: volume
-        source: frontend_dist
-        target: /usr/share/nginx/html
+      - ../../fourseven_oneseven_frontend/dist:/usr/share/nginx/html
       - ../nginx/conf.d/default.prod.conf:/etc/nginx/conf.d/default.conf
       - ../nginx/ssl:/etc/nginx/ssl:ro
     networks:
@@ -29,9 +27,7 @@ services:
     networks:
       - web_network
     volumes:
-      - type: volume
-        source: frontend_dist
-        target: /usr/share/nginx/html
+      - ./fourseven_oneseven_frontend/dist:/usr/share/nginx/html
 
   jobify:
     build:
@@ -78,6 +74,6 @@ services:
 networks:
   web_network:
     driver: bridge
-  
+
 volumes:
   frontend_dist:
