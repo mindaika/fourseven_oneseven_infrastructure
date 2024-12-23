@@ -3,7 +3,7 @@
 
 # Repository configurations
 REPOS=(
-  "git@github.com:mindaika/fourseven_oneseven-frontend.git"
+  "git@github.com:mindaika/fourseven_oneseven_frontend.git"
   "git@github.com:mindaika/jobify.git"
   "git@github.com:mindaika/pixify.git"
 )
