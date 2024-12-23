@@ -1,36 +1,38 @@
-# docker-compose.yml
+name: fourseven_oneseven
+
 services:
   nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
-      - ../fourseven_oneseven-frontend/dist:/usr/share/nginx/html:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - jobify
-      - pixify
+      - ../nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  frontend:
+    build:
+      target: development
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ../../fourseven_oneseven:/app
+      - /app/node_modules
+    command: npm run dev
 
   jobify:
-    build:
-      context: ../jobify
-      dockerfile: Dockerfile
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - FLASK_APP=src
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
     volumes:
-      - ./shared:/app/shared
+      - ../../jobify/src:/app/src
 
   pixify:
-    build:
-      context: ../pixify
-      dockerfile: Dockerfile
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - FLASK_APP=src
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
     volumes:
-      - ./shared:/app/shared
+      - ../../pixify/src:/app/src

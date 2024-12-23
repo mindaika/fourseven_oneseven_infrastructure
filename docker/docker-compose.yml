@@ -1,0 +1,53 @@
+name: fourseven_oneseven
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ../../fourseven_oneseven/dist:/usr/share/nginx/html
+      - ../nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - web_network
+    depends_on:
+      - jobify
+      - pixify
+      - frontend
+
+  frontend:
+    build:
+      context: ../../fourseven_oneseven
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../../fourseven_oneseven:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - web_network
+
+  jobify:
+    build:
+      context: ../../jobify
+      dockerfile: Dockerfile
+    networks:
+      - web_network
+    expose:
+      - "5004"
+
+  pixify:
+    build:
+      context: ../../pixify
+      dockerfile: Dockerfile
+    networks:
+      - web_network
+    expose:
+      - "5005"
+
+networks:
+  web_network:
+    driver: bridge

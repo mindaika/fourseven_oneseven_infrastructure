@@ -1,3 +1,4 @@
 .env
 *.pem
 /nginx/ssl/*
+.DS_Store
