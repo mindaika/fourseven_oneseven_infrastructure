@@ -38,6 +38,8 @@ services:
       - web_network
     expose:
       - "5004"
+    ports:
+      - "5004:5004"
 
   pixify:
     build:
@@ -47,6 +49,8 @@ services:
       - web_network
     expose:
       - "5005"
+    ports:
+      - "5005:5005"
 
 networks:
   web_network:
