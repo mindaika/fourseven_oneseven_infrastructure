@@ -11,7 +11,7 @@ services:
     environment:
       - NODE_ENV=development
     volumes:
-      - ../../fourseven_oneseven:/app
+      - ../../fourseven_oneseven_frontend:/app
       - /app/node_modules
     command: npm run dev
 

@@ -17,13 +17,13 @@ services:
 
   frontend:
     build:
-      context: ../../fourseven_oneseven
+      context: ../../fourseven_oneseven_frontend
       dockerfile: Dockerfile
       target: development
     ports:
       - "5173:5173"
     volumes:
-      - ../../fourseven_oneseven:/app
+      - ../../fourseven_oneseven_frontend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
