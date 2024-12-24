@@ -1,10 +1,5 @@
 #!/bin/bash
 
-cd ../fourseven_oneseven
-echo "Building Vite application..."
-npm run build
-
-cd ../fourseven_oneseven_infrastructure
 echo "Stopping existing services..."
 docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.dev.yml down
 

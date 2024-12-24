@@ -8,31 +8,29 @@ services:
   frontend:
     build:
       target: development
+      dockerfile: Dockerfile
     environment:
       - NODE_ENV=development
-    volumes:
-      - ../../fourseven_oneseven_frontend:/app
-      - /app/node_modules
     command: npm run dev
 
   jobify:
     environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
-      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
       - FLASK_APP=src
       - FLASK_ENV=development
       - FLASK_DEBUG=1
-    volumes:
-      - ../../jobify/src:/app/src
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:5004/api/status || exit 1"]
+      interval: 00s
+      timeout: 30s
+      retries: 3
 
   pixify:
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
-      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
       - FLASK_APP=src
       - FLASK_ENV=development
       - FLASK_DEBUG=1
-    volumes:
-      - ../../pixify/src:/app/src
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:5005/api/status || exit 1"]
+      interval: 00s
+      timeout: 30s
+      retries: 3
