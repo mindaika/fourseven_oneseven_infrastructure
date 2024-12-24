@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup-prod.sh
-
+# TODO: Rewrite this thing
 # Error handling function
 error_exit() {
     echo "Error: $1" >&2
@@ -16,7 +16,7 @@ REPOS=(
 )
 
 # Base directory configuration
-BASE_DIR="/opt/fourseven_oneseven"
+BASE_DIR="~/fourseven_oneseven"
 INFRASTRUCTURE_DIR="$BASE_DIR/fourseven_oneseven_infrastructure"
 
 # Ensure script is run as root or with sudo
