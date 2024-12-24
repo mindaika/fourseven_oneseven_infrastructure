@@ -2,9 +2,7 @@
 
 echo "Building Vite application..."
 cd /home/pi/fourseven_oneseven/fourseven_oneseven_frontend
-nvm use 20
 npm run build
-
 cd /home/pi/fourseven_oneseven/fourseven_oneseven_infrastructure
 
 echo "Stopping existing services..."
