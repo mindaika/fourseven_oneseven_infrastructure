@@ -1,3 +1,3 @@
 #!/bin/bash
-docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml down
-docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d
+docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.prod.yml --env-file .env down
+docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.prod.yml --env-file .env up -d --build
