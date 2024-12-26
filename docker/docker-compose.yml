@@ -3,8 +3,6 @@ name: fourseven_oneseven
 services:
   nginx:
     image: nginx:alpine
-    ports:
-      - "80:80"
     networks:
       - web_network
     depends_on:
@@ -15,9 +13,6 @@ services:
   frontend:
     build:
       context: ../../fourseven_oneseven_frontend
-    volumes:
-      - ../../fourseven_oneseven_frontend:/app
-      - /app/node_modules
     networks:
       - web_network
 
@@ -26,6 +21,7 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - FLASK_APP=src
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5004/api/status"]
       interval: 30s
@@ -38,13 +34,10 @@ services:
       - web_network
     expose:
       - "5004"
-    ports:
-      - "5004:5004"
-    volumes:
-      - ../../jobify/src:/app/src
 
   pixify:
     environment:
+      - FLASK_APP=src
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
@@ -60,10 +53,6 @@ services:
       - web_network
     expose:
       - "5005"
-    ports:
-      - "5005:5005"
-    volumes:
-      - ../../pixify/src:/app/src
 
 networks:
   web_network:

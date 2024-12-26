@@ -11,8 +11,8 @@ services:
 
   frontend:
     build:
-      dockerfile: Dockerfile.prod
       target: production
+      dockerfile: Dockerfile.prod
     environment:
       - NODE_ENV=production
 
@@ -21,7 +21,6 @@ services:
       context: ../../jobify
       dockerfile: Dockerfile.prod
     environment:
-      - FLASK_APP=src
       - FLASK_ENV=production
       - FLASK_DEBUG=0
 
