@@ -15,13 +15,9 @@ services:
   frontend:
     build:
       context: ../../fourseven_oneseven_frontend
-    ports:
-      - "5173:5173"
     volumes:
       - ../../fourseven_oneseven_frontend:/app
       - /app/node_modules
-    environment:
-      - NODE_ENV=development
     networks:
       - web_network
 
@@ -30,6 +26,21 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:5004/api/status",
+          "||",
+          "exit",
+          "1",
+        ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
     build:
       context: ../../jobify
     networks:
@@ -46,6 +57,21 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:5005/api/status",
+          "||",
+          "exit",
+          "1",
+        ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
     build:
       context: ../../pixify
     networks:

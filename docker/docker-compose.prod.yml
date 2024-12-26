@@ -24,20 +24,6 @@ services:
       - FLASK_APP=src
       - FLASK_ENV=production
       - FLASK_DEBUG=0
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:5004/api/status",
-          "||",
-          "exit",
-          "1",
-        ]
-      interval: 300s
-      timeout: 30s
-      retries: 3
 
   pixify:
     build:
@@ -47,17 +33,3 @@ services:
       - FLASK_APP=src
       - FLASK_ENV=production
       - FLASK_DEBUG=0
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:5005/api/status",
-          "||",
-          "exit",
-          "1",
-        ]
-      interval: 300s
-      timeout: 30s
-      retries: 3
