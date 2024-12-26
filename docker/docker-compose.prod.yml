@@ -30,7 +30,10 @@ services:
           "CMD",
           "curl",
           "-f",
-          "https://garbanzo.monster/jobify/api/status || exit 1",
+          "http://localhost:5004/api/status",
+          "||",
+          "exit",
+          "1",
         ]
       interval: 300s
       timeout: 30s
@@ -50,7 +53,10 @@ services:
           "CMD",
           "curl",
           "-f",
-          "https://garbanzo.monster/pixify/api/status || exit 1",
+          "http://localhost:5005/api/status",
+          "||",
+          "exit",
+          "1",
         ]
       interval: 300s
       timeout: 30s
