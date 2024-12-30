@@ -3,11 +3,13 @@ name: fourseven_oneseven
 services:
   nginx:
     ports:
+      - "80:80" # SSL Setup. TODO: remove after
       - "443:443"
     volumes:
       - ../../fourseven_oneseven_frontend/dist:/usr/share/nginx/html:ro
       - ../nginx/conf.d/default.prod.conf:/etc/nginx/conf.d/default.conf:ro
       - ../nginx/ssl:/etc/nginx/ssl:ro
+    restart: unless-stopped
 
   frontend:
     build:
@@ -15,6 +17,7 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       - NODE_ENV=production
+    restart: unless-stopped
 
   jobify:
     build:
@@ -23,12 +26,13 @@ services:
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=0
+    restart: unless-stopped
 
   pixify:
     build:
       context: ../../pixify
       dockerfile: Dockerfile.prod
     environment:
-      - FLASK_APP=src
       - FLASK_ENV=production
       - FLASK_DEBUG=0
+    restart: unless-stopped
