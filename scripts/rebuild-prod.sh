@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Starting production rebuild..."
+export SKIP_ENV_VALIDATION=true
+
 echo "Building Vite application..."
 cd /home/pi/fourseven_oneseven/fourseven_oneseven_frontend
 npm run build
@@ -19,3 +22,5 @@ docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.prod.ym
 
 echo "Showing logs..."
 docker compose -f ./docker/docker-compose.yml -f ./docker/docker-compose.prod.yml --env-file .env logs
+
+echo "Rebuild complete!"
