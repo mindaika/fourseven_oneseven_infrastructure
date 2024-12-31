@@ -9,7 +9,7 @@ services:
 
   frontend:
     ports:
-      - "5174:5174" # There's a port conflict with Docker
+      - "5174:5174"
     build:
       target: development
       dockerfile: Dockerfile
