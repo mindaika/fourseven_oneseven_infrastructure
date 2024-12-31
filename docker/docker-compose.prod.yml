@@ -3,7 +3,6 @@ name: fourseven_oneseven
 services:
   nginx:
     ports:
-      - "80:80" # SSL Setup. TODO: remove after
       - "443:443"
     volumes:
       - ../../fourseven_oneseven_frontend/dist:/usr/share/nginx/html:ro
