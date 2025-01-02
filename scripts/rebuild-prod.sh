@@ -5,7 +5,7 @@ export SKIP_ENV_VALIDATION=true
 
 echo "Building Vite application..."
 cd /home/pi/fourseven_oneseven/fourseven_oneseven_frontend
-npm run build
+yarn build
 cd /home/pi/fourseven_oneseven/fourseven_oneseven_infrastructure
 
 echo "Stopping existing services..."

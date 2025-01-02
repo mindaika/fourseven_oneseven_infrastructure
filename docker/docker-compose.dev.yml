@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=development
-    command: npm run dev
+    command: yarn dev
     volumes:
       - /app/node_modules
       - ../../fourseven_oneseven_frontend/src:/app/src
