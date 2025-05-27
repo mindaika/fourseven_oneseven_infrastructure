@@ -16,7 +16,8 @@ PI_HOST="192.168.1.5"
 PI_USER="pi"
 REGISTRY_PORT="5000"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+INFRASTRUCTURE_ROOT="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(dirname "$INFRASTRUCTURE_ROOT")"
 
 log() {
     echo -e "${GREEN}[$(date +'%H:%M:%S')] $1${NC}"

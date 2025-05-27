@@ -17,3 +17,4 @@ environments/.env.production
 
 *.backup
 **/*.backup.*
+.multiarch-config

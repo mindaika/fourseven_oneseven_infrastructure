@@ -78,40 +78,45 @@ build_frontend() {
     
     cd "$PROJECT_ROOT/fourseven_oneseven_frontend"
     
-    # Install dependencies and build
-    if [ ! -d "node_modules" ]; then
-        log "Installing frontend dependencies..."
-        yarn install
+    # Determine which Dockerfile to use based on environment
+    local dockerfile="Dockerfile"
+    if [ "$ENVIRONMENT" = "production" ] && [ -f "Dockerfile.prod" ]; then
+        dockerfile="Dockerfile.prod"
+        log "Using production frontend Dockerfile: $dockerfile"
+    else
+        log "Using development frontend Dockerfile: $dockerfile"
     fi
     
-    log "Building frontend assets..."
-    yarn build
+    if [ ! -f "$dockerfile" ]; then
+        error "Frontend Dockerfile not found: $PROJECT_ROOT/fourseven_oneseven_frontend/$dockerfile"
+    fi
     
-    # Create nginx Dockerfile that includes built assets
-    cat > Dockerfile.multiarch << 'EOF'
-FROM nginx:alpine
-
-# Copy built static files
-COPY dist/ /usr/share/nginx/html/
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-EOF
-
-    # Build and push nginx image with static files
-    log "Building and pushing nginx+frontend image..."
+    # Source environment variables from the environment file
+    log "Loading environment variables from $ENV_FILE..."
+    set -a  # automatically export all variables
+    source "$INFRASTRUCTURE_ROOT/environments/.env.$ENVIRONMENT"
+    set +a  # stop automatically exporting
+    
+    # Debug: Show what we're passing to the build
+    log "Auth0 build arguments:"
+    log "  AUTH0_DOMAIN: ${AUTH0_DOMAIN:-NOT_SET}"
+    log "  AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID:-NOT_SET}"
+    log "  AUTH0_AUDIENCE: ${AUTH0_AUDIENCE:-NOT_SET}"
+    
+    # Build and push frontend image using the existing Dockerfile
+    log "Building and pushing frontend+nginx image with $dockerfile..."
     docker buildx build \
         --platform "$BUILD_PLATFORMS" \
         --tag "${REGISTRY_HOST}:${REGISTRY_PORT}/fourseven_oneseven_nginx:latest" \
         --push \
-        -f Dockerfile.multiarch \
+        --target production \
+        --build-arg AUTH0_DOMAIN="${AUTH0_DOMAIN}" \
+        --build-arg AUTH0_CLIENT_ID="${AUTH0_CLIENT_ID}" \
+        --build-arg AUTH0_AUDIENCE="${AUTH0_AUDIENCE}" \
+        --cache-from type=registry,ref=${REGISTRY_HOST}:${REGISTRY_PORT}/fourseven_oneseven_nginx:buildcache \
+        --cache-to type=registry,ref=${REGISTRY_HOST}:${REGISTRY_PORT}/fourseven_oneseven_nginx:buildcache,mode=max \
+        -f "$dockerfile" \
         .
-    
-    # Clean up
-    rm -f Dockerfile.multiarch
     
     log "✓ Frontend image built and pushed"
     cd "$INFRASTRUCTURE_ROOT"
@@ -140,6 +145,8 @@ build_flask_app() {
         --platform "$BUILD_PLATFORMS" \
         --tag "${REGISTRY_HOST}:${REGISTRY_PORT}/fourseven_oneseven_${app_name}:latest" \
         --push \
+        --cache-from type=registry,ref=${REGISTRY_HOST}:${REGISTRY_PORT}/fourseven_oneseven_${app_name}:buildcache \
+        --cache-to type=registry,ref=${REGISTRY_HOST}:${REGISTRY_PORT}/fourseven_oneseven_${app_name}:buildcache,mode=max \
         -f "$dockerfile" \
         .
     
