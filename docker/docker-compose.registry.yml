@@ -1,0 +1,10 @@
+# Auto-generated compose override for registry images
+services:
+  nginx:
+    image: 192.168.1.212:5000/fourseven_oneseven_nginx:latest
+
+  jobify:
+    image: 192.168.1.212:5000/fourseven_oneseven_jobify:latest
+
+  pixify:
+    image: 192.168.1.212:5000/fourseven_oneseven_pixify:latest
