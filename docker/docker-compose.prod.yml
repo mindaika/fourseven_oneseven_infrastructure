@@ -3,6 +3,7 @@ name: fourseven_oneseven
 services:
   nginx:
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - ../../fourseven_oneseven_frontend/dist:/usr/share/nginx/html:ro
