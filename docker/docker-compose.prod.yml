@@ -2,7 +2,7 @@ name: fourseven_oneseven
 
 services:
   nginx:
-    image: 192.168.1.212:5000/fourseven_oneseven_nginx:latest
+    image: nginx:alpine
     ports:
       - "80:80"
       - "443:443"
@@ -19,7 +19,9 @@ services:
     restart: unless-stopped
 
   jobify:
-    image: 192.168.1.212:5000/fourseven_oneseven_jobify:latest
+    build:
+      context: ../../jobify
+      dockerfile: Dockerfile.prod
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
@@ -39,7 +41,9 @@ services:
       retries: 3
 
   pixify:
-    image: 192.168.1.212:5000/fourseven_oneseven_pixify:latest
+    build:
+      context: ../../pixify
+      dockerfile: Dockerfile.prod
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
