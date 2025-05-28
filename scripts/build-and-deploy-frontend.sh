@@ -76,7 +76,7 @@ build_frontend() {
     # Install dependencies if node_modules is missing or package.json is newer
     if [[ ! -d "node_modules" ]] || [[ "package.json" -nt "node_modules" ]]; then
         log_info "Installing/updating dependencies..."
-        npm ci
+        yarn install --frozen-lockfile
     fi
     
     # Clean previous build
@@ -89,7 +89,7 @@ build_frontend() {
     VITE_AUTH0_CLIENT_ID="$VITE_AUTH0_CLIENT_ID" \
     VITE_AUTH0_AUDIENCE="$VITE_AUTH0_AUDIENCE" \
     NODE_ENV=production \
-    npm run build
+    yarn build
     
     # Verify build output
     if [[ ! -d "dist" ]] || [[ -z "$(ls -A dist/)" ]]; then
@@ -224,7 +224,7 @@ if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     echo ""
     echo "This script will:"
     echo "  1. Load environment variables from infrastructure/environments/.env.production"
-    echo "  2. Build the frontend locally using npm"
+    echo "  2. Build the frontend locally using yarn"
     echo "  3. Deploy static files to Pi using rsync"
     echo "  4. Restart nginx on Pi"
     echo "  5. Verify the deployment"
