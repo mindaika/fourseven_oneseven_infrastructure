@@ -10,7 +10,7 @@ services:
       - pixify
       - frontend
     volumes:
-      - ../../scripts:/docker-entrypoint.d/scripts:ro
+      - ../scripts:/docker-entrypoint.d/scripts:ro
 
   frontend:
     environment:
