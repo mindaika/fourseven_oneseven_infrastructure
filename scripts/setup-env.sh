@@ -64,14 +64,18 @@ extract_service_env() {
     local service_name="$1"
     local target_file="$2"
     
+    # Check if repository exists - if not, skip entirely
     if ! check_repo_exists "$service_name" "$(dirname "$target_file")"; then
         return 0
     fi
     
     echo -e "${BLUE}Setting up environment for $service_name...${NC}"
     
-    # Create target directory if it doesn't exist
-    mkdir -p "$(dirname "$target_file")"
+    # Only create files in existing repositories - do NOT create directories
+    if [[ ! -d "$(dirname "$target_file")" ]]; then
+        echo -e "${RED}Error: Repository directory does not exist: $(dirname "$target_file")${NC}"
+        return 1
+    fi
     
     # Start with environment marker
     echo "# Auto-generated from $SOURCE_ENV" > "$target_file"
