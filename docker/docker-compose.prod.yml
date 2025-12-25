@@ -9,7 +9,7 @@ services:
     volumes:
       - ../../fourseven_oneseven_frontend/dist:/usr/share/nginx/html:ro
       - ../nginx/conf.d/default.prod.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../nginx/ssl:/etc/nginx/ssl:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - frontend
       - jobify
