@@ -5,8 +5,7 @@ CERT_PATH="/etc/letsencrypt/live/$DOMAIN/fullchain.pem"
 DAYS_THRESHOLD=30
 INFRASTRUCTURE_DIR="$HOME/fourseven_oneseven/fourseven_oneseven_infrastructure"
 NGINX_DIR="$INFRASTRUCTURE_DIR/nginx"
-REBUILD_SCRIPT="/home/pi/fourseven_oneseven/fourseven_oneseven_infrastructure
-/scripts/rebuild-prod.sh"
+REBUILD_SCRIPT="/home/pi/fourseven_oneseven/fourseven_oneseven_infrastructure/scripts/rebuild-prod.sh"
 
 if [ -f "$CERT_PATH" ]; then
     expiry_date=$(openssl x509 -enddate -noout -in "$CERT_PATH" | cut -d= -f2)
