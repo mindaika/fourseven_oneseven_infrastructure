@@ -6,7 +6,7 @@
 
 ## Professional Summary
 
-Experienced Lead Data Engineer and Software Developer with extensive expertise in data strategy implementation, healthcare analytics, and enterprise-level data systems. Skilled in designing and optimizing scalable data pipelines using advanced tools such as Snowflake, Databricks, Azure Data Factory, and Python to deliver innovative solutions that drive business insights and operational efficiency. Demonstrates specialized knowledge in healthcare data management, including HIPAA compliance, medical coding standards (ICD, CPT, HCPCS), and claims processing systems.
+Experienced Data Engineer and Software Developer with extensive expertise in data strategy implementation, healthcare analytics, and enterprise-level data systems. Skilled in designing and optimizing scalable data pipelines using advanced tools such as Snowflake, Databricks, Azure Data Factory, and Python to deliver innovative solutions that drive business insights and operational efficiency. Demonstrates specialized knowledge in healthcare data management, including HIPAA compliance, medical coding standards (ICD, CPT, HCPCS), and claims processing systems.
 
 With a multifaceted career spanning healthcare organizations, software development, research institutions, and military service, excels at building secure, efficient, and scalable data infrastructure tailored to complex business needs. Adept at collaborating with cross-functional teams, mentoring technical staff, and fostering data-driven decision-making across stakeholder groups. Combines technical proficiency in SQL, Python, C#, and cloud technologies with comprehensive knowledge of data governance, ETL processes, and analytics visualization tools like Tableau and Power BI.
 
