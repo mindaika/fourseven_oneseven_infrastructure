@@ -15,6 +15,10 @@ environments/.env.production
 !environments/.env.example
 !environments/README.md
 
+# Secrets directory - CRITICAL: Never commit API keys
+secrets/
+secrets/*.txt
+
 *.backup
 **/*.backup.*
 .multiarch-config
