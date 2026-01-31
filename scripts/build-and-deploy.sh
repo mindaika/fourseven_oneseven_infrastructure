@@ -220,8 +220,8 @@ restart_nginx() {
         cd '$PI_DOCKER_DIR'
         
         # Check if docker compose file exists
-        if [[ ! -f 'docker-compose.prod.yml' ]]; then
-            echo 'Error: docker-compose.prod.yml not found in $PI_DOCKER_DIR'
+        if [[ ! -f 'compose.prod.yaml' ]]; then
+            echo 'Error: compose.prod.yaml not found in $PI_DOCKER_DIR'
             exit 1
         fi
         
@@ -235,17 +235,17 @@ restart_nginx() {
         fi
         
         # Check if nginx container exists and is managed by docker compose
-        if docker compose -f docker-compose.prod.yml \$ENV_FILE_FLAG ps nginx >/dev/null 2>&1; then
+        if docker compose -f compose.prod.yaml \$ENV_FILE_FLAG ps nginx >/dev/null 2>&1; then
             echo 'Restarting nginx container...'
             
             # Restart nginx specifically (this only affects nginx, not other services)
-            docker compose -f docker-compose.prod.yml \$ENV_FILE_FLAG restart nginx
+            docker compose -f compose.prod.yaml \$ENV_FILE_FLAG restart nginx
             
             # Wait for container to be ready
             sleep 5
             
             # Check if nginx is running properly
-            if docker compose -f docker-compose.prod.yml \$ENV_FILE_FLAG ps nginx | grep -q 'Up'; then
+            if docker compose -f compose.prod.yaml \$ENV_FILE_FLAG ps nginx | grep -q 'Up'; then
                 echo 'Nginx restarted successfully'
                 
                 # Test if nginx is actually serving content
@@ -257,16 +257,16 @@ restart_nginx() {
             else
                 echo 'Warning: Nginx container may not be running properly'
                 echo 'Container status:'
-                docker compose -f docker-compose.prod.yml \$ENV_FILE_FLAG ps nginx
+                docker compose -f compose.prod.yaml \$ENV_FILE_FLAG ps nginx
                 echo 'Recent logs:'
-                docker compose -f docker-compose.prod.yml \$ENV_FILE_FLAG logs nginx --tail=10
+                docker compose -f compose.prod.yaml \$ENV_FILE_FLAG logs nginx --tail=10
             fi
         else
             echo 'Nginx container not found or not managed by docker compose'
             echo 'Attempting to start nginx service...'
             
             # Try to start just nginx
-            if docker compose -f docker-compose.prod.yml \$ENV_FILE_FLAG up -d nginx; then
+            if docker compose -f compose.prod.yaml \$ENV_FILE_FLAG up -d nginx; then
                 echo 'Nginx started successfully'
             else
                 echo 'Error: Failed to start nginx'
@@ -310,7 +310,7 @@ verify_deployment() {
     log_info "Manual checks:"
     log_info "  Internal: ssh $PI_USER@$PI_HOST 'curl -I http://localhost'"
     log_info "  External: curl -I http://$PI_HOST"
-    log_info "  Docker: ssh $PI_USER@$PI_HOST 'cd $PI_DOCKER_DIR && docker compose -f docker-compose.prod.yml ps'"
+    log_info "  Docker: ssh $PI_USER@$PI_HOST 'cd $PI_DOCKER_DIR && docker compose -f compose.prod.yaml ps'"
     return 1
 }
 
