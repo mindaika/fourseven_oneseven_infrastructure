@@ -1,24 +1,42 @@
-*.pem
-/nginx/ssl/*
-.DS_Store
-._.DS_Store
-**/.DS_Store
-**/._.DS_Store
-
+# Environment files (secrets)
 .env
-.env.development
-.env.production
-environments/.env.development
-environments/.env.production
-
+*/.env
 !.env.example
-!environments/.env.example
-!environments/README.md
 
-# Secrets directory - CRITICAL: Never commit API keys
+# SSL/TLS
+*.pem
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Secrets
 secrets/
-secrets/*.txt
 
+# Backups
 *.backup
 **/*.backup.*
-.multiarch-config
+
+# Home Assistant runtime data
+homeassistant/config/.storage/
+homeassistant/config/.cloud/
+homeassistant/config/deps/
+homeassistant/config/tts/
+homeassistant/config/blueprints/
+homeassistant/config/home-assistant.log
+homeassistant/config/home-assistant.log.*
+homeassistant/config/home-assistant_v2.db
+homeassistant/config/home-assistant_v2.db-*
+homeassistant/config/.HA_VERSION
+homeassistant/config/.ha_run.lock
+homeassistant/config/secrets.yaml
+
+# Mosquitto runtime data
+homeassistant/mosquitto/data/
+homeassistant/mosquitto/log/
+
+# Pi-hole backup (migration artifact)
+infrastructure/pihole-backup/
+
+# IDE
+*.code-workspace

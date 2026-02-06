@@ -1,0 +1,41 @@
+name: homeassistant
+
+services:
+  # Home Assistant Core
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - TZ=${TZ:-America/Los_Angeles}
+    volumes:
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    network_mode: host
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # MQTT Broker (for IoT devices communication)
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+# Note: Home Assistant uses host network mode to discover local devices.
+# It will connect to PostgreSQL via localhost (infrastructure postgres on port 5432).
+# Configure the recorder in configuration.yaml:
+#   recorder:
+#     db_url: postgresql://garbanzo:PASSWORD@localhost:5432/garbanzodb

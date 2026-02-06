@@ -1,0 +1,99 @@
+name: infrastructure
+
+services:
+  # PostgreSQL - database for Home Assistant and other services
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"  # Exposed for Home Assistant on host network
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-garbanzodb}
+      - POSTGRES_USER=${POSTGRES_USER:-garbanzo}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - infra_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-garbanzo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Pi-hole - network-wide ad blocking and DNS
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:8080/tcp"  # Web interface (Pi-hole v6 uses 8080 internally)
+    environment:
+      - TZ=${TZ:-America/Los_Angeles}
+      - WEBPASSWORD=${PIHOLE_PASSWORD}
+      - PIHOLE_DNS_=1.1.1.1;1.0.0.1  # Cloudflare DNS
+      - DNSSEC=true
+      - DNS_BOGUS_PRIV=true
+      - DNS_FQDN_REQUIRED=true
+      - DNSMASQ_LISTENING=all  # Accept queries from all interfaces
+    volumes:
+      - pihole_config:/etc/pihole
+      - pihole_dnsmasq:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - infra_network
+    healthcheck:
+      test: ["CMD", "dig", "+short", "@127.0.0.1", "google.com"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx - reverse proxy for all web services
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /home/mindaika/Source/fourseven_oneseven_frontend/dist:/usr/share/nginx/html:ro
+      - certbot_webroot:/var/www/certbot
+      - nginx_cache:/var/cache/nginx
+    networks:
+      - infra_network
+      - apps_network
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  pihole_config:
+    driver: local
+  pihole_dnsmasq:
+    driver: local
+  nginx_cache:
+    driver: local
+  certbot_webroot:
+    driver: local
+
+networks:
+  infra_network:
+    name: infra_network
+    driver: bridge
+  apps_network:
+    name: apps_network
+    driver: bridge
+    external: true
