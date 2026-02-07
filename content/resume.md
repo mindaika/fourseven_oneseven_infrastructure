@@ -90,7 +90,7 @@ _February 2025 - April 2025_
 **Data Infrastructure Leadership**
 
 - Led the design, development, and optimization of data infrastructure to support healthcare claims analysis and recovery operations.
-- eveloped and maintains complex **SQL** queries and data extraction processes for retrieving, transforming, and analyzing large volumes of provider and payer claims data.
+- Developed and maintains complex **SQL** queries and data extraction processes for retrieving, transforming, and analyzing large volumes of provider and payer claims data.
 - Built and manages data pipelines and **ETL** workflows ensuring client data is cleaned, validated, and formatted for downstream analysis.
 - Designed data models and manages data warehouse solutions for efficient storage and retrieval of high-volume claims data.
 

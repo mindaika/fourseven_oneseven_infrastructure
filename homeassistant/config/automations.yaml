@@ -1,1 +1,63 @@
-[]
+- id: '1770434597360'
+  alias: Plants on
+  description: ''
+  triggers:
+  - trigger: time
+    at: 07:00:00
+  conditions: []
+  actions:
+  - type: turn_on
+    device_id: 1a820ec3cc8c4444540a3c737f80ee5b
+    entity_id: 311e4a0ed9c992f8df1cf9fe5c2a1fc3
+    domain: switch
+  mode: single
+- id: '1770434661286'
+  alias: Plants Off
+  description: ''
+  triggers:
+  - trigger: time
+    at: '19:00:00'
+  conditions: []
+  actions:
+  - type: turn_off
+    device_id: 1a820ec3cc8c4444540a3c737f80ee5b
+    entity_id: 311e4a0ed9c992f8df1cf9fe5c2a1fc3
+    domain: switch
+    metadata:
+      secondary: false
+  mode: single
+- id: '1770438411350'
+  alias: Night Lights
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunrise
+    offset: 0
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      area_id:
+      - porch
+      - garage
+    data: {}
+  mode: single
+- id: '1770438499730'
+  alias: Night Lights On
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: 0
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      area_id:
+      - garage
+      - porch
+    data:
+      brightness_pct: 50
+  mode: single
