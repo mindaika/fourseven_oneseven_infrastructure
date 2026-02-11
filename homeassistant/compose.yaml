@@ -26,11 +26,12 @@ services:
     image: ghcr.io/home-assistant-libs/python-matter-server:stable
     container_name: matter-server
     restart: unless-stopped
+    command: --storage-path /data --paa-root-cert-dir /data/credentials --bluetooth-adapter 0 --primary-interface eth0
     environment:
       - TZ=${TZ:-America/Los_Angeles}
     volumes:
       - matter_data:/data
-      - /run/dbus:/run/dbus:ro
+      - /run/dbus:/run/dbus:rw
     network_mode: host
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5580')"]

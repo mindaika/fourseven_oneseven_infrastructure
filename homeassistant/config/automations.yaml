@@ -60,4 +60,9 @@
       - porch
     data:
       brightness_pct: 50
+  - action: scene.turn_on
+    metadata: {}
+    target:
+      entity_id: scene.evening_lights
+    data: {}
   mode: single

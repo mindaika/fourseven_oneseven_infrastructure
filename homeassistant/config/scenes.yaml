@@ -1,0 +1,58 @@
+- id: '1770603165144'
+  name: Evening lights
+  entities:
+    light.brass_ball:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Brass Ball
+      supported_features: 0
+      state: 'on'
+    light.old_goldie:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Old Goldie
+      supported_features: 0
+      state: 'on'
+    light.schoolhouse:
+      min_color_temp_kelvin: 2500
+      max_color_temp_kelvin: 9000
+      min_mireds: 111
+      max_mireds: 400
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 166
+      color_temp_kelvin: 3621
+      color_temp: 276
+      hs_color:
+      - 27.061
+      - 42.206
+      rgb_color:
+      - 255
+      - 196
+      - 147
+      xy_color:
+      - 0.445
+      - 0.372
+      friendly_name: Schoolhouse
+      supported_features: 32
+      state: 'on'
+    light.blue_school_lamp:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Blue School Lamp
+      supported_features: 0
+      state: 'on'
+    light.swing_ball_lamp:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Swing Ball Lamp
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+  icon: mdi:ceiling-light-multiple

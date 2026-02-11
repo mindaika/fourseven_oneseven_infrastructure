@@ -40,3 +40,6 @@ infrastructure/pihole-backup/
 
 # IDE
 *.code-workspace
+
+# Backups
+*.tar
