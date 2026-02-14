@@ -12,7 +12,7 @@ services:
     volumes:
       - ./config:/config
       - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro
+      - /run/dbus:/run/dbus:rw
     network_mode: host
     devices:
       - /dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_d09cd44b32f4ef11b8acba1b6d9880ab-if00-port0:/dev/ttyUSB0

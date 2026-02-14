@@ -66,3 +66,46 @@
       entity_id: scene.evening_lights
     data: {}
   mode: single
+- id: '1771015767883'
+  alias: Patio Lights On
+  description: Turn on patio floods when the back door opens at night
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.back_door_sensor
+    to: 'on'
+  conditions:
+  - condition: sun
+    after: sunset
+    before: sunrise
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id:
+      - light.left_flood
+      - light.right_flood
+    data:
+      brightness_pct: 100
+  mode: single
+- id: '1771015767884'
+  alias: Patio Lights Off
+  description: Turn off patio floods after 3 minutes of no motion
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.rear_motion_sensor
+    to: 'off'
+    for:
+      minutes: 3
+  conditions:
+  - condition: sun
+    after: sunset
+    before: sunrise
+  - condition: state
+    entity_id: light.left_flood
+    state: 'on'
+  actions:
+  - action: light.turn_off
+    target:
+      entity_id:
+      - light.left_flood
+      - light.right_flood
+  mode: restart

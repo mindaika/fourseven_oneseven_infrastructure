@@ -56,3 +56,63 @@
       state: 'on'
   metadata: {}
   icon: mdi:ceiling-light-multiple
+- id: '1771015658049'
+  name: Patio Lights
+  entities:
+    update.right_flood_firmware:
+      auto_update: false
+      display_precision: 2
+      installed_version: '0x01001d08'
+      in_progress: false
+      latest_version:
+      release_summary:
+      release_url:
+      skipped_version:
+      title:
+      update_percentage:
+      device_class: firmware
+      entity_picture: https://brands.home-assistant.io/_/zha/icon.png
+      friendly_name: Right Flood Firmware
+      supported_features: 23
+      state: unknown
+    button.right_flood_identify:
+      device_class: identify
+      friendly_name: Right Flood Identify
+      state: unknown
+    light.right_flood:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 254
+      off_with_transition: false
+      off_brightness:
+      friendly_name: Right Flood
+      supported_features: 40
+      state: 'on'
+    select.right_flood_start_up_behavior:
+      options:
+      - 'Off'
+      - 'On'
+      - Toggle
+      - PreviousValue
+      friendly_name: Right Flood Start-up behavior
+      state: 'On'
+    number.right_flood_start_up_current_level:
+      min: 0
+      max: 255
+      step: 1
+      mode: auto
+      friendly_name: Right Flood Start-up current level
+      state: '254'
+    light.left_flood:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 254
+      off_with_transition: false
+      off_brightness:
+      friendly_name: Left Flood
+      supported_features: 40
+      state: 'on'
+  metadata: {}
+  icon: mdi:car-parking-lights
