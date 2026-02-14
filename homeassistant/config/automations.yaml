@@ -28,7 +28,7 @@
   mode: single
 - id: '1770438411350'
   alias: Night Lights
-  description: ''
+  description: 'Sunrise: turn off all indoor and outdoor lights, reset home state'
   triggers:
   - trigger: sun
     event: sunrise
@@ -42,10 +42,22 @@
       - porch
       - garage
     data: {}
+  - action: light.turn_off
+    target:
+      entity_id:
+      - light.schoolhouse
+      - light.blue_school_lamp
+      - light.old_goldie
+      - light.brass_ball
+      - light.swing_ball_lamp
+    data: {}
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.home_occupied
   mode: single
 - id: '1770438499730'
   alias: Night Lights On
-  description: ''
+  description: 'Sunset: turn on outdoor lights, activate evening scene if home'
   triggers:
   - trigger: sun
     event: sunset
@@ -60,11 +72,26 @@
       - porch
     data:
       brightness_pct: 50
-  - action: scene.turn_on
-    metadata: {}
-    target:
-      entity_id: scene.evening_lights
-    data: {}
+  - if:
+    - condition: state
+      entity_id: input_boolean.home_occupied
+      state: 'on'
+    then:
+    - action: scene.turn_on
+      metadata: {}
+      target:
+        entity_id: scene.evening_lights
+      data: {}
+    else:
+    - action: light.turn_on
+      target:
+        entity_id: light.schoolhouse
+      data: {}
+    - action: light.turn_on
+      target:
+        entity_id: >
+          {{ ['light.blue_school_lamp', 'light.old_goldie'] | random }}
+      data: {}
   mode: single
 - id: '1771015767883'
   alias: Patio Lights On
@@ -109,3 +136,141 @@
       - light.left_flood
       - light.right_flood
   mode: restart
+- id: '1738000000001'
+  alias: Departure Detection
+  description: >-
+    Detect departure: door closes, wait 7 min, check outdoor motion clear
+    and home_occupied hasn't changed recently (prevents false trigger on arrival)
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_door_sensor
+    - binary_sensor.back_door_sensor
+    from: 'on'
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.home_occupied
+    state: 'on'
+  actions:
+  - delay:
+      minutes: 7
+  - condition: state
+    entity_id: binary_sensor.front_porch_sensor_occupancy
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.rear_motion_sensor
+    state: 'off'
+  - condition: template
+    value_template: >-
+      {{ (now() - states.input_boolean.home_occupied.last_changed).total_seconds() > 600 }}
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.home_occupied
+  - if:
+    - condition: sun
+      after: sunset
+      before: sunrise
+    then:
+    - action: light.turn_off
+      target:
+        entity_id:
+        - light.brass_ball
+        - light.swing_ball_lamp
+      data: {}
+    - action: light.turn_on
+      target:
+        entity_id: light.schoolhouse
+      data: {}
+    - action: light.turn_on
+      target:
+        entity_id: >
+          {{ ['light.blue_school_lamp', 'light.old_goldie'] | random }}
+      data: {}
+    - action: light.turn_off
+      target:
+        entity_id: >
+          {{ 'light.old_goldie' if states('light.blue_school_lamp') == 'on' else 'light.blue_school_lamp' }}
+      data: {}
+  mode: restart
+- id: '1738000000002'
+  alias: Arrival Detection
+  description: >-
+    Detect arrival: any door opens while home_occupied is off.
+    Set home_occupied to on and restore evening lights if dark.
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_door_sensor
+    - binary_sensor.back_door_sensor
+    to: 'on'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.home_occupied
+    state: 'off'
+  actions:
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.home_occupied
+  - if:
+    - condition: sun
+      after: sunset
+      before: sunrise
+    then:
+    - action: scene.turn_on
+      target:
+        entity_id: scene.evening_lights
+      data: {}
+  mode: single
+- id: '1738000000003'
+  alias: Bedtime Lights Off
+  description: >-
+    When master bedroom door closes after sunset and before sunrise,
+    turn off all evening scene lights
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.master_bedroom_door_sensor
+    from: 'on'
+    to: 'off'
+  conditions:
+  - condition: sun
+    after: sunset
+    before: sunrise
+  - condition: state
+    entity_id: input_boolean.home_occupied
+    state: 'on'
+  actions:
+  - action: light.turn_off
+    target:
+      entity_id:
+      - light.schoolhouse
+      - light.blue_school_lamp
+      - light.old_goldie
+      - light.brass_ball
+      - light.swing_ball_lamp
+    data: {}
+  mode: single
+- id: '1738000000004'
+  alias: Morning Wake Up Light
+  description: >-
+    When master bedroom door opens after 5 AM but before sunrise,
+    turn on Blue School Lamp
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.master_bedroom_door_sensor
+    from: 'off'
+    to: 'on'
+  conditions:
+  - condition: sun
+    before: sunrise
+  - condition: time
+    after: '05:00:00'
+  - condition: state
+    entity_id: input_boolean.home_occupied
+    state: 'on'
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.blue_school_lamp
+    data: {}
+  mode: single

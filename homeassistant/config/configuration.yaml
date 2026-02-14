@@ -2,6 +2,12 @@
 # Loads default set of integrations. Do not remove.
 default_config:
 
+# Helpers
+input_boolean:
+  home_occupied:
+    name: Home Occupied
+    icon: mdi:home-account
+
 # Reverse proxy configuration
 http:
   use_x_forwarded_for: true
