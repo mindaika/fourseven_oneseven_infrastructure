@@ -13,7 +13,6 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 172.19.0.0/16
-  ip_bans_enabled: true
   login_attempts_threshold: 3
 
 # Load frontend themes from the themes folder
