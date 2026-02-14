@@ -50,6 +50,7 @@
       - light.old_goldie
       - light.brass_ball
       - light.swing_ball_lamp
+      - light.living_room_tapo_1_tapo_smart_plug_2
     data: {}
   - action: input_boolean.turn_on
     target:
@@ -90,7 +91,7 @@
     - action: light.turn_on
       target:
         entity_id: >
-          {{ ['light.blue_school_lamp', 'light.old_goldie'] | random }}
+          {{ ['light.blue_school_lamp', 'light.old_goldie', 'light.living_room_tapo_1_tapo_smart_plug_2'] | random }}
       data: {}
   mode: single
 - id: '1771015767883'
@@ -177,6 +178,9 @@
         entity_id:
         - light.brass_ball
         - light.swing_ball_lamp
+        - light.blue_school_lamp
+        - light.old_goldie
+        - light.living_room_tapo_1_tapo_smart_plug_2
       data: {}
     - action: light.turn_on
       target:
@@ -185,12 +189,7 @@
     - action: light.turn_on
       target:
         entity_id: >
-          {{ ['light.blue_school_lamp', 'light.old_goldie'] | random }}
-      data: {}
-    - action: light.turn_off
-      target:
-        entity_id: >
-          {{ 'light.old_goldie' if states('light.blue_school_lamp') == 'on' else 'light.blue_school_lamp' }}
+          {{ ['light.blue_school_lamp', 'light.old_goldie', 'light.living_room_tapo_1_tapo_smart_plug_2'] | random }}
       data: {}
   mode: restart
 - id: '1738000000002'
@@ -248,6 +247,7 @@
       - light.old_goldie
       - light.brass_ball
       - light.swing_ball_lamp
+      - light.living_room_tapo_1_tapo_smart_plug_2
     data: {}
   mode: single
 - id: '1738000000004'
