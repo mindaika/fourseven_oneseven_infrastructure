@@ -7,8 +7,8 @@
   conditions: []
   actions:
   - type: turn_on
-    device_id: 1a820ec3cc8c4444540a3c737f80ee5b
-    entity_id: 311e4a0ed9c992f8df1cf9fe5c2a1fc3
+    device_id: f519ae9987f84e701fc3ab8c15512758
+    entity_id: bd054eb6014f22c09078968ebe0dc399
     domain: switch
   mode: single
 - id: '1770434661286'
@@ -20,8 +20,8 @@
   conditions: []
   actions:
   - type: turn_off
-    device_id: 1a820ec3cc8c4444540a3c737f80ee5b
-    entity_id: 311e4a0ed9c992f8df1cf9fe5c2a1fc3
+    device_id: f519ae9987f84e701fc3ab8c15512758
+    entity_id: bd054eb6014f22c09078968ebe0dc399
     domain: switch
     metadata:
       secondary: false
