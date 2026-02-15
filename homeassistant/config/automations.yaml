@@ -8,7 +8,7 @@
   actions:
   - type: turn_on
     device_id: f519ae9987f84e701fc3ab8c15512758
-    entity_id: bd054eb6014f22c09078968ebe0dc399
+    entity_id: a34ea4c7b0e64e4b9ebc18dbe6bd3ff0
     domain: switch
   mode: single
 - id: '1770434661286'
@@ -21,10 +21,8 @@
   actions:
   - type: turn_off
     device_id: f519ae9987f84e701fc3ab8c15512758
-    entity_id: bd054eb6014f22c09078968ebe0dc399
+    entity_id: a34ea4c7b0e64e4b9ebc18dbe6bd3ff0
     domain: switch
-    metadata:
-      secondary: false
   mode: single
 - id: '1770438411350'
   alias: Night Lights
@@ -55,6 +53,9 @@
   - action: input_boolean.turn_on
     target:
       entity_id: input_boolean.home_occupied
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.asleep
   mode: single
 - id: '1770438499730'
   alias: Night Lights On
@@ -164,7 +165,7 @@
     entity_id: input_boolean.home_occupied
     state: 'on'
   - condition: time
-    after: '06:00:00'
+    after: 06:00:00
     before: '22:00:00'
   actions:
   - delay:
@@ -222,7 +223,7 @@
     entity_id: input_boolean.home_occupied
     state: 'off'
   - condition: time
-    after: '06:00:00'
+    after: 06:00:00
     before: '22:00:00'
   actions:
   - action: input_boolean.turn_on
@@ -240,8 +241,8 @@
   mode: single
 - id: '1738000000003'
   alias: Bedtime Lights Off
-  description: When master bedroom door closes after sunset and before sunrise, turn
-    off all evening scene lights
+  description: When master bedroom door closes at night, turn off all lights except
+    Swing Ball Lamp including porch and garage
   triggers:
   - trigger: state
     entity_id: binary_sensor.master_bedroom_door_sensor
@@ -262,14 +263,19 @@
       - light.blue_school_lamp
       - light.old_goldie
       - light.brass_ball
-      - light.swing_ball_lamp
       - light.living_room_tapo_1_tapo_smart_plug_2
+    data: {}
+  - action: light.turn_off
+    target:
+      area_id:
+      - porch
+      - garage
     data: {}
   mode: single
 - id: '1738000000004'
   alias: Morning Wake Up Light
-  description: When master bedroom door opens after 5 AM but before sunrise, turn
-    on Blue School Lamp
+  description: When bedroom door opens after 5AM before sunrise with bedside lamp
+    on, turn on a random downstairs lamp
   triggers:
   - trigger: state
     entity_id: binary_sensor.master_bedroom_door_sensor
@@ -283,10 +289,14 @@
   - condition: state
     entity_id: input_boolean.home_occupied
     state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.bedroom_tapo_1_top_current_consumption
+    above: 5
   actions:
   - action: light.turn_on
     target:
-      entity_id: light.blue_school_lamp
+      entity_id: '{{ [''light.blue_school_lamp'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+        | random }}'
     data: {}
   mode: single
 - id: '1739600000001'
@@ -305,4 +315,111 @@
       entity_id: media_player.dont_use
     data:
       source: Optical
+  mode: single
+- id: 'bedtime_sleep_detection'
+  alias: Bedtime Sleep Detection
+  description: First time bedside lamp turns off at night, turn off Swing Ball and
+    Schoolhouse and mark as asleep until 5AM
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.bedroom_tapo_1_top_current_consumption
+    below: 5
+  conditions:
+  - condition: sun
+    after: sunset
+    before: sunrise
+  - condition: state
+    entity_id: input_boolean.asleep
+    state: 'off'
+  - condition: state
+    entity_id: input_boolean.home_occupied
+    state: 'on'
+  actions:
+  - action: light.turn_off
+    target:
+      entity_id:
+      - light.swing_ball_lamp
+      - light.schoolhouse
+    data: {}
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.asleep
+  mode: single
+- id: 'reset_asleep_flag'
+  alias: Reset Asleep Flag
+  description: Reset asleep flag at 5AM to enable morning automations
+  triggers:
+  - trigger: time
+    at: '05:00:00'
+  conditions: []
+  actions:
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.asleep
+  mode: single
+- id: 'porch_motion_lights'
+  alias: Porch Motion Lights
+  description: Turn on porch lights on front motion after bedtime, stay on for 5
+    minutes after motion clears
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.front_porch_sensor_occupancy
+    to: 'on'
+  conditions:
+  - condition: sun
+    after: sunset
+    before: sunrise
+  - condition: state
+    entity_id: binary_sensor.master_bedroom_door_sensor
+    state: 'off'
+  actions:
+  - action: light.turn_on
+    target:
+      area_id: porch
+    data:
+      brightness_pct: 50
+  - wait_for_trigger:
+    - trigger: state
+      entity_id: binary_sensor.front_porch_sensor_occupancy
+      to: 'off'
+    timeout:
+      minutes: 30
+  - delay:
+      minutes: 5
+  - action: light.turn_off
+    target:
+      area_id: porch
+  mode: restart
+- id: 'humidifier_fan_on'
+  alias: Green Room Fan On With Humidifier
+  description: When humidifier starts drawing power, snapshot Mid Fan state and turn
+    it on
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
+    above: 10
+  conditions: []
+  actions:
+  - action: scene.create
+    data:
+      scene_id: green_room_fan_before_humidifier
+      snapshot_entities:
+      - fan.mid_fan
+  - action: fan.turn_on
+    target:
+      entity_id: fan.mid_fan
+  mode: single
+- id: 'humidifier_fan_restore'
+  alias: Green Room Fan Restore After Humidifier
+  description: When humidifier stops drawing power, restore Mid Fan to its previous
+    state
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
+    below: 10
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    target:
+      entity_id: scene.green_room_fan_before_humidifier
   mode: single

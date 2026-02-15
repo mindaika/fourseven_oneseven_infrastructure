@@ -7,6 +7,9 @@ input_boolean:
   home_occupied:
     name: Home Occupied
     icon: mdi:home-account
+  asleep:
+    name: Asleep
+    icon: mdi:sleep
 
 # Reverse proxy configuration
 http:
