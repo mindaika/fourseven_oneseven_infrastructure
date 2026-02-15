@@ -121,7 +121,7 @@
   description: Turn off patio floods after 3 minutes of no motion
   triggers:
   - trigger: state
-    entity_id: binary_sensor.rear_motion_sensor
+    entity_id: binary_sensor.rear_motion_sensor_occupancy
     to: 'off'
     for:
       minutes: 3
@@ -139,7 +139,7 @@
     entity_id: light.left_flood
     state: 'on'
   - condition: state
-    entity_id: binary_sensor.rear_motion_sensor
+    entity_id: binary_sensor.rear_motion_sensor_occupancy
     state: 'off'
   actions:
   - action: light.turn_off
@@ -163,6 +163,9 @@
   - condition: state
     entity_id: input_boolean.home_occupied
     state: 'on'
+  - condition: time
+    after: '06:00:00'
+    before: '22:00:00'
   actions:
   - delay:
       minutes: 7
@@ -170,7 +173,7 @@
     entity_id: binary_sensor.front_porch_sensor_occupancy
     state: 'off'
   - condition: state
-    entity_id: binary_sensor.rear_motion_sensor
+    entity_id: binary_sensor.rear_motion_sensor_occupancy
     state: 'off'
   - condition: template
     value_template: '{{ (now() - states.input_boolean.home_occupied.last_changed).total_seconds()
@@ -218,6 +221,9 @@
   - condition: state
     entity_id: input_boolean.home_occupied
     state: 'off'
+  - condition: time
+    after: '06:00:00'
+    before: '22:00:00'
   actions:
   - action: input_boolean.turn_on
     target:
@@ -282,4 +288,21 @@
     target:
       entity_id: light.blue_school_lamp
     data: {}
+  mode: single
+- id: '1739600000001'
+  alias: Receiver On When WiiM Playing
+  description: Turn on the Yamaha receiver when WiiM starts playing
+  triggers:
+  - trigger: state
+    entity_id: media_player.wiim_2
+    to: playing
+  actions:
+  - action: media_player.turn_on
+    target:
+      entity_id: media_player.dont_use
+  - action: media_player.select_source
+    target:
+      entity_id: media_player.dont_use
+    data:
+      source: Optical
   mode: single
