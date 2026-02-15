@@ -1,0 +1,25 @@
+energy_colors:
+  # Energy Dashboard Tempo
+  energy-grid-consumption-color-0: "#000000"   # Black
+  energy-grid-consumption-color-1: "#AA0000"   # Dark Red
+  energy-grid-consumption-color-2: "#00AA00"   # Dark Green
+  energy-grid-consumption-color-3: "#AA5500"   # Brown
+  energy-grid-consumption-color-4: "#0000AA"   # Dark Blue
+  energy-grid-consumption-color-5: "#AA00AA"   # Dark Magenta
+  energy-grid-consumption-color-6: "#00AAAA"   # Dark Cyan
+  energy-grid-consumption-color-7: "#AAAAAA"   # Light Gray
+  energy-grid-consumption-color-8: "#555555"   # Dark Gray
+  energy-grid-consumption-color-9: "#FF5555"   # Light Red
+  energy-grid-consumption-color-10: "#55FF55"  # Light Green
+  energy-grid-consumption-color-11: "#FFFF55"  # Light Yellow
+  energy-grid-consumption-color-12: "#5555FF"  # Light Blue
+  energy-grid-consumption-color-13: "#FF55FF"  # Light Magenta
+  energy-grid-consumption-color-14: "#55FFFF"  # Light Cyan
+  energy-grid-consumption-color-15: "#FFFFFF"  # White
+  energy-grid-return-color: "#00ff00"
+  energy-solar-color: "#ffcc00"
+  energy-battery-in-color: "#0000ff"
+  energy-battery-out-color: "#00ccff"
+  energy-gas-color: "#ff6600"
+  energy-water-color: "#0099cc"
+  energy-non-fossil-color: "#66cc66"

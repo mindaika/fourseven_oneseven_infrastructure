@@ -90,8 +90,10 @@
       data: {}
     - action: light.turn_on
       target:
-        entity_id: >
-          {{ ['light.blue_school_lamp', 'light.old_goldie', 'light.living_room_tapo_1_tapo_smart_plug_2'] | random }}
+        entity_id: '{{ [''light.blue_school_lamp'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+          | random }}
+
+          '
       data: {}
   mode: single
 - id: '1771015767883'
@@ -123,6 +125,12 @@
     to: 'off'
     for:
       minutes: 3
+  - trigger: state
+    entity_id: binary_sensor.back_door_sensor
+    from: 'on'
+    to: 'off'
+    for:
+      minutes: 3
   conditions:
   - condition: sun
     after: sunset
@@ -130,6 +138,9 @@
   - condition: state
     entity_id: light.left_flood
     state: 'on'
+  - condition: state
+    entity_id: binary_sensor.rear_motion_sensor
+    state: 'off'
   actions:
   - action: light.turn_off
     target:
@@ -139,9 +150,8 @@
   mode: restart
 - id: '1738000000001'
   alias: Departure Detection
-  description: >-
-    Detect departure: door closes, wait 7 min, check outdoor motion clear
-    and home_occupied hasn't changed recently (prevents false trigger on arrival)
+  description: 'Detect departure: door closes, wait 7 min, check outdoor motion clear
+    and home_occupied hasn''t changed recently (prevents false trigger on arrival)'
   triggers:
   - trigger: state
     entity_id:
@@ -163,8 +173,8 @@
     entity_id: binary_sensor.rear_motion_sensor
     state: 'off'
   - condition: template
-    value_template: >-
-      {{ (now() - states.input_boolean.home_occupied.last_changed).total_seconds() > 600 }}
+    value_template: '{{ (now() - states.input_boolean.home_occupied.last_changed).total_seconds()
+      > 600 }}'
   - action: input_boolean.turn_off
     target:
       entity_id: input_boolean.home_occupied
@@ -188,15 +198,16 @@
       data: {}
     - action: light.turn_on
       target:
-        entity_id: >
-          {{ ['light.blue_school_lamp', 'light.old_goldie', 'light.living_room_tapo_1_tapo_smart_plug_2'] | random }}
+        entity_id: '{{ [''light.blue_school_lamp'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+          | random }}
+
+          '
       data: {}
   mode: restart
 - id: '1738000000002'
   alias: Arrival Detection
-  description: >-
-    Detect arrival: any door opens while home_occupied is off.
-    Set home_occupied to on and restore evening lights if dark.
+  description: 'Detect arrival: any door opens while home_occupied is off. Set home_occupied
+    to on and restore evening lights if dark.'
   triggers:
   - trigger: state
     entity_id:
@@ -223,9 +234,8 @@
   mode: single
 - id: '1738000000003'
   alias: Bedtime Lights Off
-  description: >-
-    When master bedroom door closes after sunset and before sunrise,
-    turn off all evening scene lights
+  description: When master bedroom door closes after sunset and before sunrise, turn
+    off all evening scene lights
   triggers:
   - trigger: state
     entity_id: binary_sensor.master_bedroom_door_sensor
@@ -252,9 +262,8 @@
   mode: single
 - id: '1738000000004'
   alias: Morning Wake Up Light
-  description: >-
-    When master bedroom door opens after 5 AM but before sunrise,
-    turn on Blue School Lamp
+  description: When master bedroom door opens after 5 AM but before sunrise, turn
+    on Blue School Lamp
   triggers:
   - trigger: state
     entity_id: binary_sensor.master_bedroom_door_sensor
@@ -264,7 +273,7 @@
   - condition: sun
     before: sunrise
   - condition: time
-    after: '05:00:00'
+    after: 05:00:00
   - condition: state
     entity_id: input_boolean.home_occupied
     state: 'on'

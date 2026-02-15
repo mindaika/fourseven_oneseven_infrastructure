@@ -31,6 +31,9 @@ homeassistant/config/.HA_VERSION
 homeassistant/config/.ha_run.lock
 homeassistant/config/secrets.yaml
 
+# HACS custom components
+homeassistant/config/custom_components/
+
 # Mosquitto runtime data
 homeassistant/mosquitto/data/
 homeassistant/mosquitto/log/
