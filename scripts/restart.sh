@@ -9,7 +9,7 @@ if [ -z "$1" ]; then
     echo "Services:"
     echo "  all           - Restart everything"
     echo "  infra         - Restart infrastructure (postgres, pihole, nginx)"
-    echo "  apps          - Restart applications (jobify, pixify)"
+    echo "  apps          - Restart applications (jobify, pixify, dancetrak)"
     echo "  ha            - Restart Home Assistant"
     echo "  <container>   - Restart specific container"
     exit 1
