@@ -31,18 +31,23 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "8080:8080/tcp"  # Web interface (Pi-hole v6 uses 8080 internally)
+      - "8080:80/tcp"  # Web interface (Pi-hole v6 web server listens on 80 internally)
     environment:
       - TZ=${TZ:-America/Los_Angeles}
-      - WEBPASSWORD=${PIHOLE_PASSWORD}
-      - PIHOLE_DNS_=1.1.1.1;1.0.0.1;9.9.9.9;149.112.112.112  # Cloudflare + Quad9
-      - DNSSEC=true
-      - DNS_BOGUS_PRIV=true
-      - DNS_FQDN_REQUIRED=true
-      - DNSMASQ_LISTENING=all  # Accept queries from all interfaces
+      - FTLCONF_webserver_api_password=${PIHOLE_PASSWORD}
+      - FTLCONF_dns_upstreams=1.1.1.1;1.0.0.1;9.9.9.9;149.112.112.112  # Cloudflare + Quad9
+      - FTLCONF_dns_dnssec=true
+      - FTLCONF_dns_bogusPriv=true
+      - FTLCONF_dns_domainNeeded=true
+      - FTLCONF_dns_listeningMode=all  # Accept queries from all interfaces
+      - FTLCONF_webserver_domain=hole.garbanzo.monster
+      - FTLCONF_webserver_port=80,[::]:80  # HTTPS handled by nginx
     volumes:
       - pihole_config:/etc/pihole
       - pihole_dnsmasq:/etc/dnsmasq.d
+    dns:
+      - 1.1.1.1
+      - 9.9.9.9
     cap_add:
       - NET_ADMIN
     networks:
