@@ -16,8 +16,9 @@ server {
 
 # photo.garbanzo.monster - Synology DSM Photos
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
     server_name photo.garbanzo.monster;
 
     ssl_certificate /etc/letsencrypt/live/garbanzo.monster/fullchain.pem;
@@ -57,8 +58,9 @@ server {
 
 # Main site - garbanzo.monster
 server {
-    listen 443 ssl http2 default_server;
-    listen [::]:443 ssl http2 default_server;
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    http2 on;
     server_name garbanzo.monster www.garbanzo.monster;
 
     ssl_certificate /etc/letsencrypt/live/garbanzo.monster/fullchain.pem;
@@ -129,6 +131,65 @@ server {
             add_header 'Content-Length' 0;
             return 204;
         }
+    }
+
+    # DanceTrak API
+    location /dancetrak/ {
+        proxy_pass http://dancetrak:5006/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Large video uploads
+        client_max_body_size 2G;
+        proxy_request_buffering off;
+        proxy_connect_timeout 600;
+        proxy_send_timeout 600;
+        proxy_read_timeout 600;
+
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
+        add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range' always;
+
+        # Handle preflight
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+    }
+}
+
+# dancetrak.garbanzo.monster - DanceTrak dedicated subdomain
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name dancetrak.garbanzo.monster;
+
+    ssl_certificate /etc/letsencrypt/live/garbanzo.monster/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/garbanzo.monster/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Frontend static files
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
     }
 
     # DanceTrak API
