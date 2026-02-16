@@ -6,10 +6,9 @@
     at: 07:00:00
   conditions: []
   actions:
-  - type: turn_on
-    device_id: f519ae9987f84e701fc3ab8c15512758
-    entity_id: a34ea4c7b0e64e4b9ebc18dbe6bd3ff0
-    domain: switch
+  - action: switch.turn_on
+    target:
+      entity_id: switch.yellow_room_tapo_1_tapo_smart_plug_1
   mode: single
 - id: '1770434661286'
   alias: Plants Off
@@ -19,10 +18,9 @@
     at: '19:00:00'
   conditions: []
   actions:
-  - type: turn_off
-    device_id: f519ae9987f84e701fc3ab8c15512758
-    entity_id: a34ea4c7b0e64e4b9ebc18dbe6bd3ff0
-    domain: switch
+  - action: switch.turn_off
+    target:
+      entity_id: switch.yellow_room_tapo_1_tapo_smart_plug_1
   mode: single
 - id: '1770438411350'
   alias: Night Lights
@@ -359,8 +357,8 @@
   mode: single
 - id: 'porch_motion_lights'
   alias: Porch Motion Lights
-  description: Turn on porch lights on front motion after bedtime, stay on for 5
-    minutes after motion clears
+  description: Turn on porch lights on front motion at night, stay on for 5 minutes
+    after motion clears
   triggers:
   - trigger: state
     entity_id: binary_sensor.front_porch_sensor_occupancy
@@ -369,15 +367,12 @@
   - condition: sun
     after: sunset
     before: sunrise
-  - condition: state
-    entity_id: binary_sensor.master_bedroom_door_sensor
-    state: 'off'
   actions:
   - action: light.turn_on
     target:
       area_id: porch
     data:
-      brightness_pct: 50
+      brightness_pct: 100
   - wait_for_trigger:
     - trigger: state
       entity_id: binary_sensor.front_porch_sensor_occupancy
@@ -501,4 +496,54 @@
   - action: input_boolean.turn_off
     target:
       entity_id: input_boolean.humidifier_fan_control
+  mode: single
+- id: 'bedside_button_control'
+  alias: Bedside Button Control
+  description: 'SNZB-01P button: single=sunset fade, double=off, long=sunrise fade'
+  triggers:
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      # TODO: Replace with actual device_ieee of your SNZB-01P
+      device_ieee: '00:00:00:00:00:00:00:00'
+      command: toggle
+    id: single
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_ieee: '00:00:00:00:00:00:00:00'
+      command: both_buttons
+    id: double
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_ieee: '00:00:00:00:00:00:00:00'
+      command: long_press
+    id: long
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: single
+      sequence:
+      - action: script.bedside_sunset
+    - conditions:
+      - condition: trigger
+        id: double
+      sequence:
+      - action: script.turn_off
+        target:
+          entity_id: script.bedside_sunset
+      - action: script.turn_off
+        target:
+          entity_id: script.bedside_sunrise
+      - action: light.turn_off
+        target:
+          entity_id: light.bedside_lamp
+    - conditions:
+      - condition: trigger
+        id: long
+      sequence:
+      - action: script.bedside_sunrise
   mode: single

@@ -1,0 +1,94 @@
+bedside_sunset:
+  alias: Bedside Sunset Fade
+  description: Gradually dim and warm the bedside lamp over 20 minutes, then turn off
+  mode: restart
+  sequence:
+  # Stage 1: Warm and slightly dim (0-5 min)
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 180
+      color_temp_kelvin: 2700
+      transition: 300
+  - delay:
+      minutes: 5
+  # Stage 2: Warmer and dimmer (5-10 min)
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 120
+      color_temp_kelvin: 2500
+      transition: 300
+  - delay:
+      minutes: 5
+  # Stage 3: Deep amber, low (10-15 min)
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 60
+      color_temp_kelvin: 2500
+      transition: 300
+  - delay:
+      minutes: 5
+  # Stage 4: Barely there (15-20 min)
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 5
+      color_temp_kelvin: 2500
+      transition: 300
+  - delay:
+      minutes: 5
+  # Off
+  - action: light.turn_off
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      transition: 5
+
+bedside_sunrise:
+  alias: Bedside Sunrise Fade
+  description: Gradually brighten and cool the bedside lamp over 15 minutes
+  mode: restart
+  sequence:
+  # Stage 1: Deep warm glow
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 3
+      color_temp_kelvin: 2500
+  - delay:
+      seconds: 5
+  # Stage 2: Slowly brighten, still warm (0-5 min)
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 40
+      color_temp_kelvin: 2500
+      transition: 300
+  - delay:
+      minutes: 5
+  # Stage 3: Brighter, warming up (5-10 min)
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 120
+      color_temp_kelvin: 2900
+      transition: 300
+  - delay:
+      minutes: 5
+  # Stage 4: Morning brightness (10-15 min)
+  - action: light.turn_on
+    target:
+      entity_id: light.bedside_lamp
+    data:
+      brightness: 200
+      color_temp_kelvin: 3500
+      transition: 300

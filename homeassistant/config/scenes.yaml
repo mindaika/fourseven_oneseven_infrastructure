@@ -24,19 +24,19 @@
       - color_temp
       - hs
       color_mode: color_temp
-      brightness: 166
-      color_temp_kelvin: 3621
-      color_temp: 276
+      brightness: 140
+      color_temp_kelvin: 2500
+      color_temp: 400
       hs_color:
-      - 27.061
-      - 42.206
+      - 29.704
+      - 68.627
       rgb_color:
       - 255
-      - 196
-      - 147
+      - 166
+      - 80
       xy_color:
-      - 0.445
-      - 0.372
+      - 0.526
+      - 0.387
       friendly_name: Schoolhouse
       supported_features: 32
       state: 'on'
@@ -63,3 +63,24 @@
       state: 'on'
   metadata: {}
   icon: mdi:ceiling-light-multiple
+- id: '1739700000001'
+  name: All lights on
+  icon: mdi:lightbulb-group
+  entities:
+    light.schoolhouse:
+      state: 'on'
+      brightness: 255
+      color_temp_kelvin: 4000
+    light.brass_ball:
+      state: 'on'
+    light.old_goldie:
+      state: 'on'
+    light.blue_school_lamp:
+      state: 'on'
+    light.swing_ball_lamp:
+      state: 'on'
+    light.living_room_tapo_1_tapo_smart_plug_2:
+      state: 'on'
+    light.rectolamp:
+      state: 'on'
+  metadata: {}
