@@ -67,7 +67,7 @@ services:
           cpus: '0.25'
           memory: 256M
 
-  # DanceTrak - Dance video tracking service
+  # DanceTrak - Dance video tracker and organizer
   dancetrak:
     build:
       context: /home/mindaika/Source/dancetrak
@@ -78,7 +78,7 @@ services:
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
       - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
-      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/dancetrak
+      - DATABASE_URL=postgresql://garbanzo:${POSTGRES_PASSWORD}@postgres:5432/garbanzodb
       - FLASK_ENV=production
       - FLASK_DEBUG=0
       - VIDEO_STORAGE_PATH=/mnt/dancetrak
@@ -109,8 +109,8 @@ networks:
     name: apps_network
     driver: bridge
   infra_network:
-    external: true
     name: infra_network
+    external: true
 
 volumes:
   dancetrak_videos:
