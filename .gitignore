@@ -27,6 +27,8 @@ homeassistant/config/home-assistant.log
 homeassistant/config/home-assistant.log.*
 homeassistant/config/home-assistant_v2.db
 homeassistant/config/home-assistant_v2.db-*
+homeassistant/config/zigbee.db
+homeassistant/config/zigbee.db-*
 homeassistant/config/.HA_VERSION
 homeassistant/config/.ha_run.lock
 homeassistant/config/secrets.yaml

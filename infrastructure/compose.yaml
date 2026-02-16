@@ -66,8 +66,11 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - SYNOLOGY_ADDR=${SYNOLOGY_ADDR}
+      - HA_GATEWAY_ADDR=${HA_GATEWAY_ADDR}
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /home/mindaika/Source/fourseven_oneseven_frontend/dist:/usr/share/nginx/html:ro
       - certbot_webroot:/var/www/certbot

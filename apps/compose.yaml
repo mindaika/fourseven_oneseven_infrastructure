@@ -81,6 +81,7 @@ services:
       - DATABASE_URL=postgresql://garbanzo:${POSTGRES_PASSWORD}@postgres:5432/garbanzodb
       - FLASK_ENV=production
       - FLASK_DEBUG=0
+      - VIDEO_STORAGE_PATH=/mnt/dancetrak
     expose:
       - "5006"
     volumes:
@@ -103,14 +104,6 @@ services:
           cpus: '0.25'
           memory: 256M
 
-volumes:
-  dancetrak_videos:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=192.168.1.25,nolock,soft,rw
-      device: ":/volume1/dancetrak"
-
 networks:
   apps_network:
     name: apps_network
@@ -118,3 +111,11 @@ networks:
   infra_network:
     name: infra_network
     external: true
+
+volumes:
+  dancetrak_videos:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NAS_IP},nolock,soft,rw
+      device: ":/volume1/dancetrak"
