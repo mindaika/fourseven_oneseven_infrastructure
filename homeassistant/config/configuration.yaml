@@ -10,6 +10,12 @@ input_boolean:
   asleep:
     name: Asleep
     icon: mdi:sleep
+  humidifier_fan_control:
+    name: Humidifier Turned Fan On
+    icon: mdi:fan
+  hvac_fan_control:
+    name: HVAC Turned Fans On
+    icon: mdi:hvac
 
 # Reverse proxy configuration
 http:

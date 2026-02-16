@@ -390,36 +390,115 @@
     target:
       area_id: porch
   mode: restart
+- id: 'hvac_fans_on'
+  alias: Fans On With HVAC
+  description: When HVAC starts heating or cooling, snapshot all fan states and turn
+    them on for air circulation
+  triggers:
+  - trigger: state
+    entity_id: climate.my_ecobee
+    attribute: hvac_action
+    to: heating
+  - trigger: state
+    entity_id: climate.my_ecobee
+    attribute: hvac_action
+    to: cooling
+  conditions:
+  - condition: state
+    entity_id: input_boolean.hvac_fan_control
+    state: 'off'
+  actions:
+  - action: scene.create
+    data:
+      scene_id: hvac_fan_snapshot
+      snapshot_entities:
+      - fan.mid_fan
+      - fan.cat_fan
+      - fan.big_vornado
+      - fan.silver_vornado
+      - fan.tiny_fan
+  - action: fan.turn_on
+    target:
+      entity_id:
+      - fan.mid_fan
+      - fan.cat_fan
+      - fan.big_vornado
+      - fan.silver_vornado
+      - fan.tiny_fan
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.hvac_fan_control
+  mode: single
+- id: 'hvac_fans_restore'
+  alias: Fans Restore After HVAC
+  description: When HVAC stops heating or cooling, restore all fans to their prior
+    state
+  triggers:
+  - trigger: state
+    entity_id: climate.my_ecobee
+    attribute: hvac_action
+    to: idle
+  - trigger: state
+    entity_id: climate.my_ecobee
+    attribute: hvac_action
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.hvac_fan_control
+    state: 'on'
+  actions:
+  - action: scene.turn_on
+    target:
+      entity_id: scene.hvac_fan_snapshot
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.hvac_fan_control
+  mode: single
 - id: 'humidifier_fan_on'
-  alias: Green Room Fan On With Humidifier
-  description: When humidifier starts drawing power, snapshot Mid Fan state and turn
-    it on
+  alias: Yellow Room Fan On With Humidifier
+  description: When humidifier starts drawing power, turn on Mid Fan if it was off
+    and track that we turned it on
   triggers:
   - trigger: numeric_state
     entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
     above: 10
   conditions: []
   actions:
-  - action: scene.create
-    data:
-      scene_id: green_room_fan_before_humidifier
-      snapshot_entities:
-      - fan.mid_fan
-  - action: fan.turn_on
-    target:
+  - if:
+    - condition: state
       entity_id: fan.mid_fan
+      state: 'off'
+    then:
+    - action: fan.turn_on
+      target:
+        entity_id: fan.mid_fan
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.humidifier_fan_control
+    else:
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.humidifier_fan_control
   mode: single
 - id: 'humidifier_fan_restore'
-  alias: Green Room Fan Restore After Humidifier
-  description: When humidifier stops drawing power, restore Mid Fan to its previous
-    state
+  alias: Yellow Room Fan Restore After Humidifier
+  description: When humidifier stops drawing power, turn off Mid Fan only if we
+    turned it on
   triggers:
   - trigger: numeric_state
     entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
     below: 10
-  conditions: []
+    for:
+      seconds: 10
+  conditions:
+  - condition: state
+    entity_id: input_boolean.humidifier_fan_control
+    state: 'on'
   actions:
-  - action: scene.turn_on
+  - action: fan.turn_off
     target:
-      entity_id: scene.green_room_fan_before_humidifier
+      entity_id: fan.mid_fan
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.humidifier_fan_control
   mode: single
