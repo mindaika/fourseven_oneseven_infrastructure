@@ -67,7 +67,55 @@ services:
           cpus: '0.25'
           memory: 256M
 
+  # DanceTrak - Dance video tracking service
+  dancetrak:
+    build:
+      context: /home/mindaika/Source/dancetrak
+      dockerfile: Dockerfile.prod
+    container_name: dancetrak
+    restart: unless-stopped
+    environment:
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/dancetrak
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+      - VIDEO_STORAGE_PATH=/mnt/dancetrak
+    expose:
+      - "5006"
+    volumes:
+      - dancetrak_videos:/mnt/dancetrak
+    networks:
+      - apps_network
+      - infra_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5006/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
 networks:
   apps_network:
     name: apps_network
     driver: bridge
+  infra_network:
+    external: true
+    name: infra_network
+
+volumes:
+  dancetrak_videos:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NAS_IP},nolock,soft,rw
+      device: ":/volume1/dancetrak"
