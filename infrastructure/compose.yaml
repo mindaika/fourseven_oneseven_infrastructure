@@ -17,7 +17,7 @@ services:
     networks:
       - infra_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-garbanzo}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-garbanzo} -d ${POSTGRES_DB:-garbanzodb}"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -192,9 +192,18 @@ server {
         add_header Cache-Control "no-cache";
     }
 
+    # Jobify API (needed for shared footer/hit-counter)
+    location /jobify/ {
+        proxy_pass http://jobify:5004/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     # DanceTrak API
-    location /dancetrak/ {
-        proxy_pass http://dancetrak:5006/;
+    location /dancetrak/api/ {
+        proxy_pass http://dancetrak:5006/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -228,8 +237,9 @@ server {
 
 # Home Assistant (host network mode, reached via host gateway)
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
     server_name ha.garbanzo.monster;
 
     ssl_certificate /etc/letsencrypt/live/garbanzo.monster/fullchain.pem;
@@ -249,8 +259,9 @@ server {
 
 # dsm.garbanzo.monster - Synology DSM main interface
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
     server_name dsm.garbanzo.monster;
 
     ssl_certificate /etc/letsencrypt/live/garbanzo.monster/fullchain.pem;
@@ -286,8 +297,9 @@ server {
 
 # hole.garbanzo.monster - Pi-hole admin interface
 server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
     server_name hole.garbanzo.monster;
 
     ssl_certificate /etc/letsencrypt/live/garbanzo.monster/fullchain.pem;
