@@ -5,6 +5,7 @@
 
 # SSL/TLS
 *.pem
+infrastructure/nginx/certs/
 
 # macOS
 .DS_Store

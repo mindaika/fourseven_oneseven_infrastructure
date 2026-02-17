@@ -71,6 +71,7 @@ services:
       - HA_GATEWAY_ADDR=${HA_GATEWAY_ADDR}
     volumes:
       - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/certs/synology-ca.crt:/etc/nginx/certs/synology-ca.crt:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /home/mindaika/Source/fourseven_oneseven_frontend/dist:/usr/share/nginx/html:ro
       - certbot_webroot:/var/www/certbot
