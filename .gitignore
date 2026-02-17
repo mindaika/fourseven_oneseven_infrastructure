@@ -32,6 +32,7 @@ homeassistant/config/zigbee.db-*
 homeassistant/config/.HA_VERSION
 homeassistant/config/.ha_run.lock
 homeassistant/config/secrets.yaml
+homeassistant/config/image/
 
 # HACS custom components
 homeassistant/config/custom_components/
