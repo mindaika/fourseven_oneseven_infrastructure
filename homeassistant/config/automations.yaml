@@ -390,8 +390,7 @@
   mode: restart
 - id: 'hvac_fans_on'
   alias: Fans On With HVAC
-  description: When HVAC starts heating or cooling, snapshot all fan states and turn
-    them on for air circulation
+  description: When HVAC starts heating or cooling, turn on all fans for air circulation
   triggers:
   - trigger: state
     entity_id: climate.my_ecobee
@@ -401,20 +400,8 @@
     entity_id: climate.my_ecobee
     attribute: hvac_action
     to: cooling
-  conditions:
-  - condition: state
-    entity_id: input_boolean.hvac_fan_control
-    state: 'off'
+  conditions: []
   actions:
-  - action: scene.create
-    data:
-      scene_id: hvac_fan_snapshot
-      snapshot_entities:
-      - fan.mid_fan
-      - fan.cat_fan
-      - fan.big_vornado
-      - fan.silver_vornado
-      - fan.tiny_fan
   - action: fan.turn_on
     target:
       entity_id:
@@ -423,14 +410,11 @@
       - fan.big_vornado
       - fan.silver_vornado
       - fan.tiny_fan
-  - action: input_boolean.turn_on
-    target:
-      entity_id: input_boolean.hvac_fan_control
   mode: single
 - id: 'hvac_fans_restore'
-  alias: Fans Restore After HVAC
-  description: When HVAC stops heating or cooling, restore all fans to their prior
-    state
+  alias: Fans Off After HVAC
+  description: When HVAC stops, turn off all fans. Keep Mid Fan on if humidifier is
+    running.
   triggers:
   - trigger: state
     entity_id: climate.my_ecobee
@@ -440,48 +424,42 @@
     entity_id: climate.my_ecobee
     attribute: hvac_action
     to: 'off'
-  conditions:
-  - condition: state
-    entity_id: input_boolean.hvac_fan_control
-    state: 'on'
+  conditions: []
   actions:
-  - action: scene.turn_on
+  - action: fan.turn_off
     target:
-      entity_id: scene.hvac_fan_snapshot
-  - action: input_boolean.turn_off
-    target:
-      entity_id: input_boolean.hvac_fan_control
+      entity_id:
+      - fan.mid_fan
+      - fan.cat_fan
+      - fan.big_vornado
+      - fan.silver_vornado
+      - fan.tiny_fan
+  - if:
+    - condition: numeric_state
+      entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
+      above: 10
+    then:
+    - action: fan.turn_on
+      target:
+        entity_id: fan.mid_fan
   mode: single
 - id: 'humidifier_fan_on'
   alias: Yellow Room Fan On With Humidifier
-  description: When humidifier starts drawing power, turn on Mid Fan if it was off
-    and track that we turned it on
+  description: When humidifier starts drawing power, turn on Mid Fan
   triggers:
   - trigger: numeric_state
     entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
     above: 10
   conditions: []
   actions:
-  - if:
-    - condition: state
+  - action: fan.turn_on
+    target:
       entity_id: fan.mid_fan
-      state: 'off'
-    then:
-    - action: fan.turn_on
-      target:
-        entity_id: fan.mid_fan
-    - action: input_boolean.turn_on
-      target:
-        entity_id: input_boolean.humidifier_fan_control
-    else:
-    - action: input_boolean.turn_off
-      target:
-        entity_id: input_boolean.humidifier_fan_control
   mode: single
 - id: 'humidifier_fan_restore'
-  alias: Yellow Room Fan Restore After Humidifier
-  description: When humidifier stops drawing power, turn off Mid Fan only if we
-    turned it on
+  alias: Yellow Room Fan Off After Humidifier
+  description: When humidifier stops drawing power, turn off Mid Fan unless HVAC is
+    actively running
   triggers:
   - trigger: numeric_state
     entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
@@ -489,16 +467,12 @@
     for:
       seconds: 10
   conditions:
-  - condition: state
-    entity_id: input_boolean.humidifier_fan_control
-    state: 'on'
+  - condition: template
+    value_template: "{{ state_attr('climate.my_ecobee', 'hvac_action') not in ['heating', 'cooling'] }}"
   actions:
   - action: fan.turn_off
     target:
       entity_id: fan.mid_fan
-  - action: input_boolean.turn_off
-    target:
-      entity_id: input_boolean.humidifier_fan_control
   mode: single
 - id: 'bedside_button_control'
   alias: Bedside Button Control
