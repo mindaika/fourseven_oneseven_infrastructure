@@ -7,7 +7,7 @@ echo "🚀 Starting Pi5 services..."
 
 # Start infrastructure first (PostgreSQL, Pi-hole, nginx)
 echo "📦 Starting infrastructure..."
-cd ~/Source/fourseven_oneseven_infrastructure/infrastructure && docker compose up -d
+cd ~/Source/fourseven_oneseven_dev/fourseven_oneseven_infrastructure/infrastructure && docker compose up -d
 
 # Wait for PostgreSQL to be ready
 echo "⏳ Waiting for PostgreSQL..."
