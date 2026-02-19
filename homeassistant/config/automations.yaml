@@ -177,6 +177,9 @@
   - condition: template
     value_template: '{{ (now() - states.input_boolean.home_occupied.last_changed).total_seconds()
       > 600 }}'
+  - condition: state
+    entity_id: device_tracker.canarsie
+    state: not_home
   - action: input_boolean.turn_off
     target:
       entity_id: input_boolean.home_occupied
