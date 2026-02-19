@@ -84,3 +84,177 @@
     light.rectolamp:
       state: 'on'
   metadata: {}
+- id: '1771466900001'
+  name: Winter Yard
+  icon: mdi:snowflake
+  entities:
+    light.string_lights:
+      state: 'on'
+      brightness: 255
+      hs_color:
+      - 210
+      - 80
+    switch.string_lights_gradient_toggle:
+      state: 'on'
+    light.p1:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 210
+      - 70
+    light.p2:
+      state: 'on'
+      brightness: 200
+      color_temp_kelvin: 6500
+    light.p3:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 220
+      - 50
+- id: '1771466900004'
+  name: Spring Yard
+  icon: mdi:flower
+  entities:
+    light.string_lights:
+      state: 'on'
+      brightness: 230
+      hs_color:
+      - 140
+      - 60
+    switch.string_lights_gradient_toggle:
+      state: 'on'
+    light.p1:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 140
+      - 60
+    light.p2:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 300
+      - 40
+    light.p3:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 60
+      - 50
+- id: '1771466900005'
+  name: Summer Yard
+  icon: mdi:white-balance-sunny
+  entities:
+    light.string_lights:
+      state: 'on'
+      brightness: 255
+      hs_color:
+      - 35
+      - 85
+    switch.string_lights_gradient_toggle:
+      state: 'on'
+    light.p1:
+      state: 'on'
+      brightness: 200
+      hs_color:
+      - 35
+      - 80
+    light.p2:
+      state: 'on'
+      brightness: 200
+      hs_color:
+      - 50
+      - 70
+    light.p3:
+      state: 'on'
+      brightness: 200
+      hs_color:
+      - 20
+      - 90
+- id: '1771466900006'
+  name: Autumn Yard
+  icon: mdi:leaf
+  entities:
+    light.string_lights:
+      state: 'on'
+      brightness: 230
+      hs_color:
+      - 18
+      - 95
+    switch.string_lights_gradient_toggle:
+      state: 'on'
+    light.p1:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 25
+      - 90
+    light.p2:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 10
+      - 95
+    light.p3:
+      state: 'on'
+      brightness: 180
+      hs_color:
+      - 40
+      - 80
+- id: '1771466900002'
+  name: Irish Flag Porch
+  icon: mdi:flag
+  entities:
+    light.p1:
+      state: 'on'
+      brightness: 200
+      hs_color:
+      - 130
+      - 100
+    light.p2:
+      state: 'on'
+      brightness: 255
+      color_temp_kelvin: 5500
+    light.p3:
+      state: 'on'
+      brightness: 200
+      hs_color:
+      - 43
+      - 100
+- id: '1771466900003'
+  name: Porch Neutral
+  icon: mdi:lightbulb-group-outline
+  entities:
+    light.p1:
+      state: 'on'
+      brightness: 150
+      color_temp_kelvin: 3000
+    light.p2:
+      state: 'on'
+      brightness: 150
+      color_temp_kelvin: 3000
+    light.p3:
+      state: 'on'
+      brightness: 150
+      color_temp_kelvin: 3000
+- id: '1771466900008'
+  name: Yard Ambience
+  icon: mdi:weather-night
+  entities:
+    light.p1:
+      state: 'on'
+      brightness: 50
+      color_temp_kelvin: 2700
+    light.p2:
+      state: 'on'
+      brightness: 50
+      color_temp_kelvin: 2700
+    light.p3:
+      state: 'on'
+      brightness: 50
+      color_temp_kelvin: 2700
+    light.string_lights:
+      state: 'on'
+      brightness: 40
+      color_temp_kelvin: 2700

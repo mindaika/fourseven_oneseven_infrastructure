@@ -55,6 +55,23 @@ services:
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
 
+  # Govee2MQTT Bridge (exposes Govee devices to Home Assistant via MQTT)
+  govee2mqtt:
+    image: ghcr.io/wez/govee2mqtt:latest
+    container_name: govee2mqtt
+    restart: unless-stopped
+    environment:
+      - GOVEE_EMAIL=${GOVEE_EMAIL}
+      - GOVEE_PASSWORD=${GOVEE_PASSWORD}
+      - GOVEE_API_KEY=${GOVEE_API_KEY}
+      - GOVEE_MQTT_HOST=${GOVEE_MQTT_HOST:-localhost}
+      - GOVEE_MQTT_PORT=${GOVEE_MQTT_PORT:-1883}
+      - GOVEE_TEMPERATURE_SCALE=${GOVEE_TEMPERATURE_SCALE:-F}
+      - TZ=${TZ:-America/Los_Angeles}
+    network_mode: host
+    depends_on:
+      - mosquitto
+
 volumes:
   matter_data:
 
