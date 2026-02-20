@@ -25,3 +25,39 @@ frontend:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+template:
+  - sensor:
+      - name: "Grid Usage This Month Wh"
+        unique_id: grid_usage_this_month_wh
+        unit_of_measurement: "Wh"
+        state: >
+          {{ (states('sensor.elec_account_6537807941_current_bill_electric_usage_to_date') | float(0) * 1000) | round(1) }}
+
+      - name: "Computer Energy This Month Wh"
+        unique_id: computer_energy_this_month_wh
+        unit_of_measurement: "Wh"
+        state: >
+          {{ (states('sensor.eve_energy_power_top') | float(0) * 1000) | round(1) }}
+
+      - name: "Untracked Energy This Month"
+        unique_id: untracked_energy_this_month
+        unit_of_measurement: "Wh"
+        state: >
+          {{ [
+            (states('sensor.elec_account_6537807941_current_bill_electric_usage_to_date') | float(0) * 1000) - (
+              states('sensor.schoolhouse_this_month_s_consumption') | float(0) +
+              states('sensor.lr_p210m_tapo_smart_plug_1_this_month_s_consumption') | float(0) +
+              states('sensor.lr_p210m_tapo_smart_plug_2_this_month_s_consumption') | float(0) +
+              states('sensor.yellow_room_tapo_1_top_this_month_s_consumption') | float(0) +
+              states('sensor.yellow_room_tapo_1_bottom_this_month_s_consumption') | float(0) +
+              states('sensor.p1_this_month_s_consumption') | float(0) +
+              states('sensor.p2_this_month_s_consumption') | float(0) +
+              states('sensor.p3_this_month_s_consumption') | float(0) +
+              states('sensor.g1_this_month_s_consumption') | float(0) +
+              states('sensor.g2_this_month_s_consumption') | float(0) +
+              states('sensor.bedroom_tapo_1_top_this_month_s_consumption') | float(0) +
+              states('sensor.bedroom_tapo_1_bottom_this_month_s_consumption') | float(0) +
+              states('sensor.computer_energy_this_month_wh') | float(0)
+            ), 0
+          ] | max }}
