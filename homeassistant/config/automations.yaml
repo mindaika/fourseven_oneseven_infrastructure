@@ -317,7 +317,7 @@
     data:
       source: Optical
   mode: single
-- id: 'bedtime_sleep_detection'
+- id: bedtime_sleep_detection
   alias: Bedtime Sleep Detection
   description: First time bedside lamp turns off at night, turn off Swing Ball and
     Schoolhouse and mark as asleep until 5AM
@@ -346,19 +346,19 @@
     target:
       entity_id: input_boolean.asleep
   mode: single
-- id: 'reset_asleep_flag'
+- id: reset_asleep_flag
   alias: Reset Asleep Flag
   description: Reset asleep flag at 5AM to enable morning automations
   triggers:
   - trigger: time
-    at: '05:00:00'
+    at: 05:00:00
   conditions: []
   actions:
   - action: input_boolean.turn_off
     target:
       entity_id: input_boolean.asleep
   mode: single
-- id: 'porch_motion_lights'
+- id: porch_motion_lights
   alias: Porch Motion Lights
   description: Turn on porch lights on front motion at night, stay on for 5 minutes
     after motion clears
@@ -388,7 +388,7 @@
     target:
       area_id: porch
   mode: restart
-- id: 'hvac_fans_on'
+- id: hvac_fans_on
   alias: Fans On With HVAC
   description: When HVAC starts heating or cooling, turn on all fans for air circulation
   triggers:
@@ -411,7 +411,7 @@
       - fan.silver_vornado
       - fan.tiny_fan
   mode: single
-- id: 'hvac_fans_restore'
+- id: hvac_fans_restore
   alias: Fans Off After HVAC
   description: When HVAC stops, turn off all fans. Keep Mid Fan on if humidifier is
     running.
@@ -443,7 +443,7 @@
       target:
         entity_id: fan.mid_fan
   mode: single
-- id: 'humidifier_fan_on'
+- id: humidifier_fan_on
   alias: Yellow Room Fan On With Humidifier
   description: When humidifier starts drawing power, turn on Mid Fan
   triggers:
@@ -456,7 +456,7 @@
     target:
       entity_id: fan.mid_fan
   mode: single
-- id: 'humidifier_fan_restore'
+- id: humidifier_fan_restore
   alias: Yellow Room Fan Off After Humidifier
   description: When humidifier stops drawing power, turn off Mid Fan unless HVAC is
     actively running
@@ -468,33 +468,33 @@
       seconds: 10
   conditions:
   - condition: template
-    value_template: "{{ state_attr('climate.my_ecobee', 'hvac_action') not in ['heating', 'cooling'] }}"
+    value_template: '{{ state_attr(''climate.my_ecobee'', ''hvac_action'') not in
+      [''heating'', ''cooling''] }}'
   actions:
   - action: fan.turn_off
     target:
       entity_id: fan.mid_fan
   mode: single
-- id: 'bedside_button_control'
+- id: bedside_button_control
   alias: Bedside Button Control
   description: 'SNZB-01P button: single=sunset fade, double=off, long=sunrise fade'
   triggers:
   - trigger: event
     event_type: zha_event
     event_data:
-      # TODO: Replace with actual device_ieee of your SNZB-01P
-      device_ieee: '00:00:00:00:00:00:00:00'
+      device_ieee: 00:00:00:00:00:00:00:00
       command: toggle
     id: single
   - trigger: event
     event_type: zha_event
     event_data:
-      device_ieee: '00:00:00:00:00:00:00:00'
+      device_ieee: 00:00:00:00:00:00:00:00
       command: both_buttons
     id: double
   - trigger: event
     event_type: zha_event
     event_data:
-      device_ieee: '00:00:00:00:00:00:00:00'
+      device_ieee: 00:00:00:00:00:00:00:00
       command: long_press
     id: long
   conditions: []
@@ -524,7 +524,7 @@
       sequence:
       - action: script.bedside_sunrise
   mode: single
-- id: 'spring_equinox_yard'
+- id: spring_equinox_yard
   alias: Spring Equinox Yard
   description: Apply Spring Yard scene on the first day of spring (March 20)
   triggers:
@@ -532,13 +532,13 @@
     at: '16:00:00'
   conditions:
   - condition: template
-    value_template: "{{ now().month == 3 and now().day == 20 }}"
+    value_template: '{{ now().month == 3 and now().day == 20 }}'
   actions:
   - action: scene.turn_on
     target:
       entity_id: scene.spring_yard
   mode: single
-- id: 'summer_solstice_yard'
+- id: summer_solstice_yard
   alias: Summer Solstice Yard
   description: Apply Summer Yard scene on the first day of summer (June 20)
   triggers:
@@ -546,13 +546,13 @@
     at: '16:00:00'
   conditions:
   - condition: template
-    value_template: "{{ now().month == 6 and now().day == 20 }}"
+    value_template: '{{ now().month == 6 and now().day == 20 }}'
   actions:
   - action: scene.turn_on
     target:
       entity_id: scene.summer_yard
   mode: single
-- id: 'autumn_equinox_yard'
+- id: autumn_equinox_yard
   alias: Autumn Equinox Yard
   description: Apply Autumn Yard scene on the first day of fall (September 22)
   triggers:
@@ -560,13 +560,13 @@
     at: '16:00:00'
   conditions:
   - condition: template
-    value_template: "{{ now().month == 9 and now().day == 22 }}"
+    value_template: '{{ now().month == 9 and now().day == 22 }}'
   actions:
   - action: scene.turn_on
     target:
       entity_id: scene.autumn_yard
   mode: single
-- id: 'winter_solstice_yard'
+- id: winter_solstice_yard
   alias: Winter Solstice Yard
   description: Apply Winter Yard scene on the first day of winter (December 21)
   triggers:
@@ -574,13 +574,13 @@
     at: '16:00:00'
   conditions:
   - condition: template
-    value_template: "{{ now().month == 12 and now().day == 21 }}"
+    value_template: '{{ now().month == 12 and now().day == 21 }}'
   actions:
   - action: scene.turn_on
     target:
       entity_id: scene.winter_yard
   mode: single
-- id: 'st_patricks_day_porch'
+- id: st_patricks_day_porch
   alias: St. Patrick's Day Porch
   description: Apply Irish Flag Porch scene on St. Patrick's Day (March 17)
   triggers:
@@ -588,52 +588,52 @@
     at: '16:00:00'
   conditions:
   - condition: template
-    value_template: "{{ now().month == 3 and now().day == 17 }}"
+    value_template: '{{ now().month == 3 and now().day == 17 }}'
   actions:
   - action: scene.turn_on
     target:
       entity_id: scene.irish_flag_porch
   mode: single
-- id: 'morning_yard_reset'
+- id: morning_yard_reset
   alias: Morning Yard Reset
   description: At midnight, apply the day's special scene or restore to neutral
   triggers:
   - trigger: time
-    at: '00:00:00'
+    at: 00:00:00
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: template
-        value_template: "{{ now().month == 3 and now().day == 17 }}"
+        value_template: '{{ now().month == 3 and now().day == 17 }}'
       sequence:
       - action: scene.turn_on
         target:
           entity_id: scene.irish_flag_porch
     - conditions:
       - condition: template
-        value_template: "{{ now().month == 3 and now().day == 20 }}"
+        value_template: '{{ now().month == 3 and now().day == 20 }}'
       sequence:
       - action: scene.turn_on
         target:
           entity_id: scene.spring_yard
     - conditions:
       - condition: template
-        value_template: "{{ now().month == 6 and now().day == 20 }}"
+        value_template: '{{ now().month == 6 and now().day == 20 }}'
       sequence:
       - action: scene.turn_on
         target:
           entity_id: scene.summer_yard
     - conditions:
       - condition: template
-        value_template: "{{ now().month == 9 and now().day == 22 }}"
+        value_template: '{{ now().month == 9 and now().day == 22 }}'
       sequence:
       - action: scene.turn_on
         target:
           entity_id: scene.autumn_yard
     - conditions:
       - condition: template
-        value_template: "{{ now().month == 12 and now().day == 21 }}"
+        value_template: '{{ now().month == 12 and now().day == 21 }}'
       sequence:
       - action: scene.turn_on
         target:
