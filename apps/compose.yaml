@@ -4,7 +4,7 @@ services:
   # Jobify - AI-powered job application assistant
   jobify:
     build:
-      context: /home/mindaika/Source/fourseven_oneseven_dev/jobify
+      context: /home/mindaika/Source/jobify
       dockerfile: Dockerfile.prod
     container_name: jobify
     restart: unless-stopped
@@ -38,7 +38,7 @@ services:
   # Pixify - AI-powered image generation service
   pixify:
     build:
-      context: /home/mindaika/Source/fourseven_oneseven_dev/pixify
+      context: /home/mindaika/Source/pixify
       dockerfile: Dockerfile.prod
     container_name: pixify
     restart: unless-stopped
@@ -71,7 +71,7 @@ services:
   # DanceTrak - Dance video tracker and organizer
   dancetrak:
     build:
-      context: /home/mindaika/Source/fourseven_oneseven_dev/dancetrak
+      context: /home/mindaika/Source/dancetrak
       dockerfile: Dockerfile.prod
     container_name: dancetrak
     restart: unless-stopped

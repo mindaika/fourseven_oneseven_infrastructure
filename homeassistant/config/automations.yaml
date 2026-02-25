@@ -646,3 +646,24 @@
       target:
         entity_id: scene.porch_neutral
   mode: single
+- id: '1771825489634'
+  alias: Light timer
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: b7cca1c52795240a23ccae9fdc7037c3
+    entity_id: 92e36bb98018b9e8e9ba9999a9f84236
+    domain: light
+    trigger: device
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      entity_id: light.clothes_light
+    data: {}
+  mode: single
