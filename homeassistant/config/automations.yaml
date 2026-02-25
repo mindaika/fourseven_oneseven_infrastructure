@@ -47,6 +47,7 @@
       - light.brass_ball
       - light.swing_ball_lamp
       - light.living_room_tapo_1_tapo_smart_plug_2
+      - light.string_lights
     data: {}
   - action: input_boolean.turn_on
     target:
@@ -69,9 +70,51 @@
     target:
       area_id:
       - garage
-      - porch
     data:
       brightness_pct: 50
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 3 and now().day == 17 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.irish_flag_porch
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 3 and now().day == 20 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.spring_yard
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 6 and now().day == 20 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.summer_yard
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 9 and now().day == 22 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.autumn_yard
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 12 and now().day == 21 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.winter_yard
+    default:
+    - action: scene.turn_on
+      target:
+        entity_id: scene.yard_ambience
+    - action: scene.turn_on
+      target:
+        entity_id: scene.porch_neutral
   - if:
     - condition: state
       entity_id: input_boolean.home_occupied
@@ -117,19 +160,19 @@
   mode: single
 - id: '1771015767884'
   alias: Patio Lights Off
-  description: Turn off patio floods after 3 minutes of no motion
+  description: Turn off patio floods after 2 minutes of no motion
   triggers:
   - trigger: state
     entity_id: binary_sensor.rear_motion_sensor_occupancy
     to: 'off'
     for:
-      minutes: 3
+      minutes: 2
   - trigger: state
     entity_id: binary_sensor.back_door_sensor
     from: 'on'
     to: 'off'
     for:
-      minutes: 3
+      minutes: 2
   conditions:
   - condition: sun
     after: sunset
@@ -299,6 +342,46 @@
       entity_id: '{{ [''light.blue_school_lamp'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
         | random }}'
     data: {}
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 3 and now().day == 17 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.irish_flag_porch
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 3 and now().day == 20 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.spring_yard
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 6 and now().day == 20 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.summer_yard
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 9 and now().day == 22 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.autumn_yard
+    - conditions:
+      - condition: template
+        value_template: "{{ now().month == 12 and now().day == 21 }}"
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.winter_yard
+    default:
+    - action: scene.turn_on
+      target:
+        entity_id: scene.yard_ambience
   mode: single
 - id: '1739600000001'
   alias: Receiver On When WiiM Playing
@@ -341,6 +424,7 @@
       entity_id:
       - light.swing_ball_lamp
       - light.schoolhouse
+      - light.string_lights
     data: {}
   - action: input_boolean.turn_on
     target:
