@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Backup infrastructure services to Synology NAS via NFS
-# Syncs: Home Assistant backups, PostgreSQL dump, Pi-hole config
+# Syncs: Home Assistant backups, PostgreSQL dump, Pi-hole config, Vaultwarden data
 # Runs daily at 6 AM via cron (after HA's ~5:30 AM auto-backup)
 
 set -euo pipefail
@@ -19,6 +19,7 @@ NAS_BACKUP_DIR="$NAS_MOUNT/pi-backups"
 POSTGRES_RETENTION_DAYS=14
 
 HA_BACKUP_SRC="$REPO_DIR/homeassistant/config/backups"
+VAULTWARDEN_DATA_SRC="$INFRA_DIR/vaultwarden/data"
 PIHOLE_BACKUP_SRC="$INFRA_DIR/backups/pihole-teleporter.tar.gz"
 
 TIMESTAMP="$(date +%Y-%m-%d_%H%M)"
@@ -32,7 +33,8 @@ fi
 # Create NAS directory structure
 mkdir -p "$NAS_BACKUP_DIR/homeassistant" \
          "$NAS_BACKUP_DIR/postgres" \
-         "$NAS_BACKUP_DIR/pihole"
+         "$NAS_BACKUP_DIR/pihole" \
+         "$NAS_BACKUP_DIR/vaultwarden"
 
 # --- Home Assistant backups ---
 echo "Syncing Home Assistant backups..."
@@ -55,6 +57,16 @@ echo "  Saved $PG_DUMP_FILE ($PG_SIZE)"
 find "$NAS_BACKUP_DIR/postgres" -name "pgdumpall_*.sql.gz" -mtime +$POSTGRES_RETENTION_DAYS -delete
 PG_REMAINING=$(find "$NAS_BACKUP_DIR/postgres" -name "pgdumpall_*.sql.gz" | wc -l)
 echo "  Keeping $PG_REMAINING dump(s) (${POSTGRES_RETENTION_DAYS}-day retention)"
+
+# --- Vaultwarden data ---
+echo "Syncing Vaultwarden data..."
+if [[ -d "$VAULTWARDEN_DATA_SRC" ]]; then
+    rsync -a --delete "$VAULTWARDEN_DATA_SRC/" "$NAS_BACKUP_DIR/vaultwarden/"
+    VW_SIZE=$(du -sh "$NAS_BACKUP_DIR/vaultwarden" | cut -f1)
+    echo "  Synced Vaultwarden data to NAS ($VW_SIZE)"
+else
+    echo "  Warning: Vaultwarden data directory not found at $VAULTWARDEN_DATA_SRC" >&2
+fi
 
 # --- Pi-hole backup ---
 echo "Copying Pi-hole backup..."

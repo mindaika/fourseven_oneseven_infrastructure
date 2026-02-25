@@ -39,6 +39,9 @@ homeassistant/config/custom_components/
 homeassistant/mosquitto/data/
 homeassistant/mosquitto/log/
 
+# Vaultwarden runtime data
+infrastructure/vaultwarden/data/
+
 # Pi-hole backup (migration artifact)
 infrastructure/pihole-backup/
 
