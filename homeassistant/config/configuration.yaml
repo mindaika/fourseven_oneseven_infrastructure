@@ -42,8 +42,8 @@ template:
             states('sensor.p1_this_month_s_consumption') | float(0) +
             states('sensor.p2_this_month_s_consumption') | float(0) +
             states('sensor.p3_this_month_s_consumption') | float(0) +
-            states('sensor.g1_this_month_s_consumption') | float(0) +
-            states('sensor.g2_this_month_s_consumption') | float(0) +
+            states('sensor.aqara_g1_summation_delivered') | float(0) +
+            states('sensor.aqara_g2_summation_delivered') | float(0) +
             states('sensor.bedroom_tapo_1_top_this_month_s_consumption') | float(0) +
             states('sensor.bedroom_tapo_1_bottom_this_month_s_consumption') | float(0) +
             states('sensor.computer_energy_this_month_wh') | float(0) %}
