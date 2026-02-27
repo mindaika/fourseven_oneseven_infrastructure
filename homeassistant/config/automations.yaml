@@ -398,7 +398,7 @@
     target:
       entity_id: media_player.dont_use
     data:
-      source: Optical
+      source: WiiM
   mode: single
 - id: bedtime_sleep_detection
   alias: Bedtime Sleep Detection
