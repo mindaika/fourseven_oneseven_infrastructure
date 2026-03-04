@@ -308,6 +308,7 @@
       - light.old_goldie
       - light.brass_ball
       - light.living_room_tapo_1_tapo_smart_plug_2
+      - light.string_lights
     data: {}
   - action: light.turn_off
     target:
@@ -494,6 +495,11 @@
       - fan.big_vornado
       - fan.silver_vornado
       - fan.tiny_fan
+  - action: fan.turn_on
+    target:
+      entity_id: fan.inovelli_vzm36_fan
+    data:
+      percentage: 33
   mode: single
 - id: hvac_fans_restore
   alias: Fans Off After HVAC
@@ -518,6 +524,7 @@
       - fan.big_vornado
       - fan.silver_vornado
       - fan.tiny_fan
+      - fan.inovelli_vzm36_fan
   - if:
     - condition: numeric_state
       entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
