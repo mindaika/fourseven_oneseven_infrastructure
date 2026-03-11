@@ -405,12 +405,12 @@
         entity_id: scene.yard_ambience
   mode: single
 - id: '1739600000001'
-  alias: Receiver On When WiiM Playing
-  description: Turn on the Yamaha receiver when WiiM starts playing
+  alias: Receiver On When Shairport Playing
+  description: Turn on the Yamaha receiver when Shairport Sync (WhaaM) starts playing
   triggers:
   - trigger: state
-    entity_id: media_player.wiim_2
-    to: playing
+    entity_id: binary_sensor.whaam_playing
+    to: 'on'
   actions:
   - action: media_player.turn_on
     target:
