@@ -48,6 +48,8 @@
       - light.swing_ball_lamp
       - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
+      - light.left_flood
+      - light.right_flood
     data: {}
   - action: input_boolean.turn_on
     target:
@@ -316,6 +318,24 @@
       - porch
       - garage
     data: {}
+  - delay:
+      seconds: 5
+  - action: light.turn_off
+    target:
+      entity_id:
+      - light.schoolhouse
+      - light.blue_school_lamp
+      - light.old_goldie
+      - light.brass_ball
+      - light.living_room_tapo_1_tapo_smart_plug_2
+      - light.string_lights
+    data: {}
+  - action: light.turn_off
+    target:
+      area_id:
+      - porch
+      - garage
+    data: {}
   mode: single
 - id: '1738000000004'
   alias: Morning Wake Up Light
@@ -430,6 +450,15 @@
   - action: input_boolean.turn_on
     target:
       entity_id: input_boolean.asleep
+  - delay:
+      seconds: 5
+  - action: light.turn_off
+    target:
+      entity_id:
+      - light.swing_ball_lamp
+      - light.schoolhouse
+      - light.string_lights
+    data: {}
   mode: single
 - id: reset_asleep_flag
   alias: Reset Asleep Flag
