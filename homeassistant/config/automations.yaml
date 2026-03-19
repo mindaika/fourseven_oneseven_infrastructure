@@ -41,6 +41,9 @@
       - light.swing_ball_lamp
       - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
+      area_id:
+      - porch
+      - garage
     data: {}
   - action: input_boolean.turn_on
     target:
