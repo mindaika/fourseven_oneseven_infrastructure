@@ -47,4 +47,4 @@ template:
             states('sensor.bedroom_tapo_1_top_this_month_s_consumption') | float(0) +
             states('sensor.bedroom_tapo_1_bottom_this_month_s_consumption') | float(0) +
             states('sensor.computer_energy_this_month_wh') | float(0) %}
-          {{ [grid - tracked, 0] | round(3) }}
+          {{ [grid - tracked, 0] | max | round(3) }}

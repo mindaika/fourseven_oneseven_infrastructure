@@ -146,9 +146,9 @@
     entity_id: binary_sensor.back_door_sensor
     to: 'on'
   conditions:
-  - condition: sun
-    after: sunset
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   actions:
   - action: light.turn_on
     target:
@@ -174,9 +174,9 @@
     for:
       minutes: 2
   conditions:
-  - condition: sun
-    after: sunset
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   - condition: state
     entity_id: light.left_flood
     state: 'on'
@@ -198,9 +198,9 @@
     entity_id: binary_sensor.back_door_sensor
     to: 'on'
   conditions:
-  - condition: sun
-    after: sunset
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   actions:
   - action: light.turn_on
     target:
@@ -228,9 +228,9 @@
     for:
       minutes: 3
   conditions:
-  - condition: sun
-    after: sunset
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   - condition: state
     entity_id: binary_sensor.rear_motion_sensor_occupancy
     state: 'off'
@@ -282,9 +282,9 @@
     target:
       entity_id: input_boolean.home_occupied
   - if:
-    - condition: sun
-      after: sunset
-      before: sunrise
+    - condition: state
+      entity_id: sun.sun
+      state: below_horizon
     then:
     - action: light.turn_off
       target:
@@ -329,9 +329,9 @@
     target:
       entity_id: input_boolean.home_occupied
   - if:
-    - condition: sun
-      after: sunset
-      before: sunrise
+    - condition: state
+      entity_id: sun.sun
+      state: below_horizon
     then:
     - action: scene.turn_on
       target:
@@ -348,9 +348,9 @@
     from: 'on'
     to: 'off'
   conditions:
-  - condition: sun
-    after: sunset
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   actions:
   - action: light.turn_off
     target:
@@ -367,6 +367,9 @@
       area_id:
       - garage
     data: {}
+  - action: lock.lock
+    target:
+      entity_id: lock.front_door_lock
   - delay:
       seconds: 5
   - action: light.turn_off
@@ -395,8 +398,9 @@
     from: 'off'
     to: 'on'
   conditions:
-  - condition: sun
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   - condition: time
     after: 05:00:00
   - condition: state
@@ -480,9 +484,9 @@
     entity_id: sensor.bedroom_tapo_1_top_current_consumption
     below: 5
   conditions:
-  - condition: sun
-    after: sunset
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   - condition: state
     entity_id: input_boolean.asleep
     state: 'off'
@@ -530,9 +534,9 @@
     entity_id: binary_sensor.front_porch_sensor_occupancy
     to: 'on'
   conditions:
-  - condition: sun
-    after: sunset
-    before: sunrise
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
   actions:
   - action: light.turn_on
     target:
