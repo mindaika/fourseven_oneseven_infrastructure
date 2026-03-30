@@ -842,12 +842,13 @@
   mode: single
 - id: auto_unlock_on_arrival
   alias: Auto Unlock Front Door on Arrival
-  description: Unlock front door when phone rejoins home WiFi after being away for
+  description: Unlock front door when phone enters home zone after being away for
     more than 15 minutes
   triggers:
   - trigger: state
-    entity_id: sensor.canarsie_ssid
-    to: Tromaville
+    entity_id: device_tracker.canarsie_2
+    from: not_home
+    to: home
   conditions:
   - condition: template
     value_template: '{{ (trigger.to_state.last_changed - trigger.from_state.last_changed).total_seconds()
