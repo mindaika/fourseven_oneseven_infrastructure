@@ -1,12 +1,13 @@
 - id: '1770603165144'
   name: Evening lights
   entities:
-    light.brass_ball:
+    light.g1:
       supported_color_modes:
-      - onoff
-      color_mode: onoff
-      friendly_name: Brass Ball
-      supported_features: 0
+      - color_temp
+      - hs
+      color_mode: color_temp
+      friendly_name: Brass Ball Lamp
+      supported_features: 32
       state: 'on'
     light.old_goldie:
       supported_color_modes:
@@ -40,12 +41,13 @@
       friendly_name: Schoolhouse
       supported_features: 32
       state: 'on'
-    light.blue_school_lamp:
+    light.g2:
       supported_color_modes:
-      - onoff
-      color_mode: onoff
+      - color_temp
+      - hs
+      color_mode: color_temp
       friendly_name: Blue School Lamp
-      supported_features: 0
+      supported_features: 32
       state: 'on'
     light.swing_ball_lamp:
       supported_color_modes:
@@ -71,11 +73,11 @@
       state: 'on'
       brightness: 255
       color_temp_kelvin: 4000
-    light.brass_ball:
+    light.g1:
       state: 'on'
     light.old_goldie:
       state: 'on'
-    light.blue_school_lamp:
+    light.g2:
       state: 'on'
     light.swing_ball_lamp:
       state: 'on'

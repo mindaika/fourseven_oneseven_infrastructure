@@ -35,9 +35,9 @@
     target:
       entity_id:
       - light.schoolhouse
-      - light.blue_school_lamp
+      - light.g2
       - light.old_goldie
-      - light.brass_ball
+      - light.g1
       - light.swing_ball_lamp
       - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
@@ -132,7 +132,7 @@
       data: {}
     - action: light.turn_on
       target:
-        entity_id: '{{ [''light.blue_school_lamp'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+        entity_id: '{{ [''light.g2'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
           | random }}
 
           '
@@ -289,9 +289,9 @@
     - action: light.turn_off
       target:
         entity_id:
-        - light.brass_ball
+        - light.g1
         - light.swing_ball_lamp
-        - light.blue_school_lamp
+        - light.g2
         - light.old_goldie
         - light.living_room_tapo_1_tapo_smart_plug_2
       data: {}
@@ -301,7 +301,7 @@
       data: {}
     - action: light.turn_on
       target:
-        entity_id: '{{ [''light.blue_school_lamp'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+        entity_id: '{{ [''light.g2'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
           | random }}
 
           '
@@ -356,9 +356,9 @@
     target:
       entity_id:
       - light.schoolhouse
-      - light.blue_school_lamp
+      - light.g2
       - light.old_goldie
-      - light.brass_ball
+      - light.g1
       - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
     data: {}
@@ -376,9 +376,9 @@
     target:
       entity_id:
       - light.schoolhouse
-      - light.blue_school_lamp
+      - light.g2
       - light.old_goldie
-      - light.brass_ball
+      - light.g1
       - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
     data: {}
@@ -412,7 +412,7 @@
   actions:
   - action: light.turn_on
     target:
-      entity_id: '{{ [''light.blue_school_lamp'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+      entity_id: '{{ [''light.g2'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
         | random }}'
     data: {}
   - choose:
