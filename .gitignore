@@ -21,6 +21,7 @@ secrets/
 # Home Assistant runtime data
 homeassistant/config/.storage/
 homeassistant/config/.cloud/
+homeassistant/config/.cache/
 homeassistant/config/deps/
 homeassistant/config/tts/
 homeassistant/config/blueprints/

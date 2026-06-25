@@ -24,10 +24,13 @@ Committed to continuous learning and improvement, with a strong foundation in Ag
 
 _July 2025 - Present_
 
-**Accomplishments**
-- Rebuilt RAD ETL to improve runtime by 65-90%
-- Introduced new practices to improve intra-team efficiency
-- Refactored ETL processes to make data consistent and predictable for end users
+**FY2026 Accomplishments**
+- Led the ground-up rebuild of an enterprise SQL Server data warehouse (RADDB), re-architecting the full ETL pipeline from a legacy system into a layered staging → core → reporting model spanning grants, awards, compliance, financial, and animal-research domains.
+- Designed and built the SSIS ingestion pipeline as a sequenced, parallelized load (multi-stage sequence containers), integrating source systems including SAGE, Workday Financials, EDW, and ORCID.
+- Authored 100+ analytical reporting views across paired schemas, plus the underlying core tables and stored-procedure population logic.
+- Delivered ~45 tracked feature/bug tickets and merged ~32 pull requests over the year, owning the work end-to-end from data modeling through deployment, security/permissions, and SQL job scheduling.
+- Solved complex data-quality problems: deduplication of awards and grant PIs, person-identity consolidation, point-in-time item-history ordering to match legacy reporting, and reconciliation of new-vs-legacy outputs.
+- Established engineering standards for the codebase — consistent formatting, naming conventions, static code analysis cleanup, an automated test-results framework, and ETL watermark/row-count tracking for load auditing.
 
 
 **Data Engineering**
