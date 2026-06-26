@@ -24,7 +24,7 @@ Committed to continuous learning and improvement, with a strong foundation in Ag
 
 _July 2025 - Present_
 
-**FY2026 Accomplishments**
+**FY26 Accomplishments**
 - Led the ground-up rebuild of an enterprise SQL Server data warehouse (RADDB), re-architecting the full ETL pipeline from a legacy system into a layered staging → core → reporting model spanning grants, awards, compliance, financial, and animal-research domains.
 - Designed and built the SSIS ingestion pipeline as a sequenced, parallelized load (multi-stage sequence containers), integrating source systems including SAGE, Workday Financials, EDW, and ORCID.
 - Authored 100+ analytical reporting views across paired schemas, plus the underlying core tables and stored-procedure population logic.
