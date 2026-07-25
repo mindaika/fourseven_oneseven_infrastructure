@@ -325,6 +325,50 @@ server {
     }
 }
 
+# oura-mcp.garbanzo.monster - MCP server for Claude App access to Oura data.
+# Internet-facing (not LAN-restricted): Claude Desktop's remote-connector
+# OAuth flow requires Anthropic's own cloud backend to reach /token
+# directly (confirmed 2026-07-25 — a LAN allowlist here silently blocked
+# the token exchange with no trace in app logs, since nginx rejected it
+# before proxying through). The actual MCP tool traffic for a remote
+# connector likely also flows through Anthropic's infrastructure rather
+# than a direct LAN connection from the user's own device, so scoping the
+# restriction to just the OAuth paths wouldn't have been enough either.
+#
+# Security now rests on the layers downstream of network reachability
+# instead: OAuth login (oauth_provider.py) gates every request, the
+# claude_reader Postgres role can only SELECT from the `reporting` schema
+# of views (see reporting_schema.sql) — no access to oura/dancetrak/
+# website/public — and the query tool rejects non-SELECT statements
+# before they reach Postgres at all. Same trust model already used for
+# vault./ha./hole./dsm. on this same nginx.
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name oura-mcp.garbanzo.monster;
+
+    ssl_certificate /etc/letsencrypt/live/garbanzo.monster/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/garbanzo.monster/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    location / {
+        proxy_pass http://oura-mcp:8765;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Streamable HTTP transport uses chunked/SSE-style responses
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 3600;
+    }
+}
+
 # hole.garbanzo.monster - Pi-hole admin interface
 server {
     listen 443 ssl;

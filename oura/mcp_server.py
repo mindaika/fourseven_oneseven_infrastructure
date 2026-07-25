@@ -14,15 +14,49 @@ Security model (by design, not just convention):
     actual enforcement.
   - Runs on the Docker network local to the Pi (infra_network), talking to
     Postgres by container name — never touches the LAN-exposed Postgres
-    port. Reachable itself only from the local network (see compose.yaml:
-    no nginx route, no public domain, no OAuth needed for that reason).
+    port.
+  - Reachable only via nginx's oura-mcp.garbanzo.monster block, which is
+    itself LAN-restricted (allow 192.168.1.0/24; deny all;) — this has a
+    real public DNS name and Let's Encrypt cert (required for OAuth's
+    RFC 8414 issuer rules and for Claude Desktop to trust it), but requests
+    from outside the home network are rejected by nginx before they ever
+    reach this process.
+  - OAuth (see oauth_provider.py) is a third, outermost layer on top of
+    the two above, required by Claude Desktop for any remote connector —
+    it is not the thing actually enforcing read-only access; the database
+    grants are.
 """
 import os
+
 import psycopg
 from psycopg.rows import dict_row
+from starlette.exceptions import HTTPException
+from starlette.requests import Request
+from starlette.responses import Response
+
+from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
 from mcp.server.fastmcp import FastMCP
 
+from oauth_provider import SingleUserOAuthProvider
+
 DATABASE_URL = os.environ["CLAUDE_READER_DATABASE_URL"]
+SERVER_URL = os.environ.get("OURA_MCP_SERVER_URL", "https://oura-mcp.garbanzo.monster")
+MCP_USERNAME = os.environ["OURA_MCP_USERNAME"]
+MCP_PASSWORD = os.environ["OURA_MCP_PASSWORD"]
+
+oauth_provider = SingleUserOAuthProvider(
+    username=MCP_USERNAME,
+    password=MCP_PASSWORD,
+    auth_callback_url=f"{SERVER_URL}/login",
+    server_url=SERVER_URL,
+    # Static fallback for clients that don't do dynamic client registration
+    # (RFC 7591) themselves — paste these into the connector's "OAuth
+    # Client ID" / "Client Secret" fields to skip the /register step
+    # entirely. Dynamic registration still works independently for any
+    # client that does support it.
+    static_client_id=os.environ.get("OURA_MCP_STATIC_CLIENT_ID"),
+    static_client_secret=os.environ.get("OURA_MCP_STATIC_CLIENT_SECRET"),
+)
 
 mcp = FastMCP(
     "oura-reporting",
@@ -34,7 +68,37 @@ mcp = FastMCP(
     ),
     host="0.0.0.0",
     port=8765,
+    auth_server_provider=oauth_provider,
+    auth=AuthSettings(
+        issuer_url=SERVER_URL,
+        client_registration_options=ClientRegistrationOptions(
+            enabled=True,
+            valid_scopes=["user"],
+            default_scopes=["user"],
+        ),
+        required_scopes=["user"],
+        # Enables RFC 9728 Protected Resource Metadata (/.well-known/oauth-
+        # protected-resource/mcp) and the resource_metadata hint on 401
+        # WWW-Authenticate headers. Without this, discovery silently fails
+        # for clients that start from a cold 401 rather than assuming
+        # endpoint locations (confirmed: Claude Desktop needs it, a manual
+        # client hitting known paths directly doesn't notice its absence).
+        resource_server_url=f"{SERVER_URL}/mcp",
+    ),
 )
+
+
+@mcp.custom_route("/login", methods=["GET"])
+async def login_page_handler(request: Request) -> Response:
+    state = request.query_params.get("state")
+    if not state:
+        raise HTTPException(400, "Missing state parameter")
+    return await oauth_provider.get_login_page(state)
+
+
+@mcp.custom_route("/login/callback", methods=["POST"])
+async def login_callback_handler(request: Request) -> Response:
+    return await oauth_provider.handle_login_callback(request)
 
 
 def _connect():

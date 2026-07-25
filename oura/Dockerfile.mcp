@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir mcp==1.28.1 "psycopg[binary]==3.2.3"
 
-COPY mcp_server.py .
+COPY mcp_server.py oauth_provider.py ./
 
 EXPOSE 8765
 

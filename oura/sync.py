@@ -52,7 +52,13 @@ def fetch_paginated(session, endpoint, start_date, end_date):
         params["next_token"] = next_token
 
 
+FULL_BACKFILL = os.environ.get("OURA_FULL_BACKFILL", "").strip() == "1"
+FULL_BACKFILL_START = date(2015, 1, 1)  # predates the first Oura ring; harmless if too early
+
+
 def last_window_end(conn, endpoint):
+    if FULL_BACKFILL:
+        return FULL_BACKFILL_START
     with conn.cursor() as cur:
         cur.execute(
             "SELECT window_end FROM oura.sync_log "
