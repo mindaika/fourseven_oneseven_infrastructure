@@ -7,7 +7,15 @@ services:
     container_name: postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"  # Exposed for Home Assistant on host network
+      - "5432:5432"  # NOTE: dancetrak/jobify/pixify connect via the host's LAN IP
+      # (apps/.env DATABASE_URL), not the container name — they're on apps_network,
+      # a separate Docker network from postgres's infra_network, so container-name
+      # DNS doesn't resolve across them. Binding this to 127.0.0.1 breaks all three
+      # apps' database access (confirmed live — reverted after testing). Fixing this
+      # properly means putting postgres on a network apps_network can also reach
+      # (or attaching apps containers to infra_network) and switching their
+      # DATABASE_URL to the container name, THEN restricting this bind. Left as a
+      # follow-up — see PROJECT_GUIDE.md H4.
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-garbanzodb}
       - POSTGRES_USER=${POSTGRES_USER:-garbanzo}

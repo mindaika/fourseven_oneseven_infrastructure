@@ -1,0 +1,29 @@
+name: oura
+
+services:
+  oura-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: oura-mcp
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Overrides the localhost-based value from .env (that one's for
+      # host-side scripts like oura-sync.sh) — inside this container,
+      # Postgres is reachable by its container name on infra_network.
+      - CLAUDE_READER_DATABASE_URL=${CLAUDE_READER_DATABASE_URL_CONTAINER}
+    ports:
+      - "8765:8765"  # LAN-reachable (e.g. http://192.168.1.54:8765/mcp) —
+      # deliberately NOT routed through nginx/Let's Encrypt. No public
+      # domain, no internet exposure. Same trust model as any other device
+      # on the home network.
+    networks:
+      - infra_network
+    # No depends_on: postgres lives in a different compose project
+    # (infrastructure/compose.yaml) and is already running continuously.
+
+networks:
+  infra_network:
+    external: true

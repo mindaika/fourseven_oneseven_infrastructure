@@ -191,8 +191,8 @@
       - light.right_flood
   mode: restart
 - id: '1771015767885'
-  alias: Late Night Garage and String Lights On
-  description: Turn on garage and string lights when back door opens at night
+  alias: Late Night Garage Lights On
+  description: Turn on garage lights when back door opens at night
   triggers:
   - trigger: state
     entity_id: binary_sensor.back_door_sensor
@@ -207,14 +207,10 @@
       area_id:
       - garage
     data: {}
-  - action: light.turn_on
-    target:
-      entity_id: light.string_lights
-    data: {}
   mode: single
 - id: '1771015767886'
-  alias: Late Night Garage and String Lights Off
-  description: Turn off garage and string lights 3 minutes after last rear motion
+  alias: Late Night Garage Lights Off
+  description: Turn off garage lights 3 minutes after last rear motion
   triggers:
   - trigger: state
     entity_id: binary_sensor.rear_motion_sensor_occupancy
@@ -239,10 +235,6 @@
     target:
       area_id:
       - garage
-    data: {}
-  - action: light.turn_off
-    target:
-      entity_id: light.string_lights
     data: {}
   mode: restart
 - id: '1738000000001'
@@ -770,10 +762,18 @@
 - id: morning_yard_reset
   alias: Morning Yard Reset
   description: At midnight, apply the day's special scene or restore to neutral
+    (skipped once bedroom door is closed for the night or asleep flag is set, so
+    it doesn't turn string/yard lights back on after bedtime)
   triggers:
   - trigger: time
     at: 00:00:00
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: input_boolean.asleep
+    state: 'off'
+  - condition: state
+    entity_id: binary_sensor.master_bedroom_door_sensor
+    state: 'on'
   actions:
   - choose:
     - conditions:
