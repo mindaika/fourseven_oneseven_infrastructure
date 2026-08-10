@@ -41,7 +41,7 @@
       friendly_name: Schoolhouse
       supported_features: 32
       state: 'on'
-    light.g2:
+    light.schoolhouse_blue:
       supported_color_modes:
       - color_temp
       - hs
@@ -54,13 +54,6 @@
       - onoff
       color_mode: onoff
       friendly_name: Swing Ball Lamp
-      supported_features: 0
-      state: 'on'
-    light.living_room_tapo_1_tapo_smart_plug_2:
-      supported_color_modes:
-      - onoff
-      color_mode: onoff
-      friendly_name: Rembrandt
       supported_features: 0
       state: 'on'
   metadata: {}
@@ -77,13 +70,11 @@
       state: 'on'
     light.old_goldie:
       state: 'on'
-    light.g2:
+    light.schoolhouse_blue:
       state: 'on'
     light.swing_ball_lamp:
       state: 'on'
-    light.living_room_tapo_1_tapo_smart_plug_2:
-      state: 'on'
-    light.rectolamp:
+    light.recto_lamp:
       state: 'on'
   metadata: {}
 - id: '1771466900001'

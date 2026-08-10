@@ -33,18 +33,31 @@ template:
         unit_of_measurement: "kWh"
         state: >
           {% set grid = states('sensor.elec_account_6537807941_current_bill_electric_usage_to_date') | float(0) %}
-          {% set tracked =
-            states('sensor.schoolhouse_this_month_s_consumption') | float(0) +
-            states('sensor.lr_p210m_tapo_smart_plug_1_this_month_s_consumption') | float(0) +
-            states('sensor.lr_p210m_tapo_smart_plug_2_this_month_s_consumption') | float(0) +
-            states('sensor.yellow_room_tapo_1_top_this_month_s_consumption') | float(0) +
-            states('sensor.yellow_room_tapo_1_bottom_this_month_s_consumption') | float(0) +
-            states('sensor.p1_this_month_s_consumption') | float(0) +
-            states('sensor.p2_this_month_s_consumption') | float(0) +
-            states('sensor.p3_this_month_s_consumption') | float(0) +
-            states('sensor.aqara_g1_summation_delivered') | float(0) +
-            states('sensor.aqara_g2_summation_delivered') | float(0) +
-            states('sensor.bedroom_tapo_1_top_this_month_s_consumption') | float(0) +
-            states('sensor.bedroom_tapo_1_bottom_this_month_s_consumption') | float(0) +
-            states('sensor.computer_energy_this_month_wh') | float(0) %}
-          {{ [grid - tracked, 0] | max | round(3) }}
+          {% set metered = [
+            'sensor.schoolhouse_this_month_s_consumption',
+            'sensor.schoolhouse_blue_this_month_s_consumption',
+            'sensor.g1_this_month_s_consumption',
+            'sensor.p1_this_month_s_consumption',
+            'sensor.p2_this_month_s_consumption',
+            'sensor.p3_this_month_s_consumption',
+            'sensor.aqara_g1_summation_delivered',
+            'sensor.aqara_lumi_light_agl001_summation_delivered',
+            'sensor.tall_bookshelf_right_top_this_month_s_consumption',
+            'sensor.tall_bookshelf_right_bottom_this_month_s_consumption',
+            'sensor.bedroom_tapo_1_top_this_month_s_consumption',
+            'sensor.bedroom_tapo_1_bottom_this_month_s_consumption',
+            'sensor.headphones_this_month_s_consumption',
+            'sensor.plant_light_this_month_s_consumption',
+            'sensor.mid_fan_this_month_s_consumption',
+            'sensor.alarm_clock_this_month_s_consumption',
+            'sensor.rembrandt_this_month_s_consumption',
+            'sensor.record_player_this_month_s_consumption',
+            'sensor.humidifier_this_month_s_consumption',
+            'sensor.yr_west_1_bottom_this_month_s_consumption',
+            'sensor.laptop_this_month_s_consumption',
+            'sensor.computer_this_month_s_consumption' ] %}
+          {% set ns = namespace(tracked=0) %}
+          {% for s in metered %}
+            {% set ns.tracked = ns.tracked + states(s) | float(0) %}
+          {% endfor %}
+          {{ [grid - ns.tracked, 0] | max | round(3) }}

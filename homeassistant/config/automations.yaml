@@ -8,7 +8,7 @@
   actions:
   - action: switch.turn_on
     target:
-      entity_id: switch.yellow_room_tapo_1_tapo_smart_plug_1
+      entity_id: switch.yr_north_1_bottom
   mode: single
 - id: '1770434661286'
   alias: Plants Off
@@ -20,7 +20,7 @@
   actions:
   - action: switch.turn_off
     target:
-      entity_id: switch.yellow_room_tapo_1_tapo_smart_plug_1
+      entity_id: switch.yr_north_1_bottom
   mode: single
 - id: '1770438411350'
   alias: Night Lights
@@ -35,11 +35,10 @@
     target:
       entity_id:
       - light.schoolhouse
-      - light.g2
+      - light.schoolhouse_blue
       - light.old_goldie
       - light.g1
       - light.swing_ball_lamp
-      - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
       area_id:
       - porch
@@ -132,7 +131,7 @@
       data: {}
     - action: light.turn_on
       target:
-        entity_id: '{{ [''light.g2'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+        entity_id: '{{ [''light.schoolhouse_blue'', ''light.old_goldie'']
           | random }}
 
           '
@@ -190,53 +189,6 @@
       - light.left_flood
       - light.right_flood
   mode: restart
-- id: '1771015767885'
-  alias: Late Night Garage Lights On
-  description: Turn on garage lights when back door opens at night
-  triggers:
-  - trigger: state
-    entity_id: binary_sensor.back_door_sensor
-    to: 'on'
-  conditions:
-  - condition: state
-    entity_id: sun.sun
-    state: below_horizon
-  actions:
-  - action: light.turn_on
-    target:
-      area_id:
-      - garage
-    data: {}
-  mode: single
-- id: '1771015767886'
-  alias: Late Night Garage Lights Off
-  description: Turn off garage lights 3 minutes after last rear motion
-  triggers:
-  - trigger: state
-    entity_id: binary_sensor.rear_motion_sensor_occupancy
-    to: 'off'
-    for:
-      minutes: 3
-  - trigger: state
-    entity_id: binary_sensor.back_door_sensor
-    from: 'on'
-    to: 'off'
-    for:
-      minutes: 3
-  conditions:
-  - condition: state
-    entity_id: sun.sun
-    state: below_horizon
-  - condition: state
-    entity_id: binary_sensor.rear_motion_sensor_occupancy
-    state: 'off'
-  actions:
-  - action: light.turn_off
-    target:
-      area_id:
-      - garage
-    data: {}
-  mode: restart
 - id: '1738000000001'
   alias: Departure Detection
   description: 'Detect departure: door closes, wait 7 min, check outdoor motion clear
@@ -283,9 +235,8 @@
         entity_id:
         - light.g1
         - light.swing_ball_lamp
-        - light.g2
+        - light.schoolhouse_blue
         - light.old_goldie
-        - light.living_room_tapo_1_tapo_smart_plug_2
       data: {}
     - action: light.turn_on
       target:
@@ -293,7 +244,7 @@
       data: {}
     - action: light.turn_on
       target:
-        entity_id: '{{ [''light.g2'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+        entity_id: '{{ [''light.schoolhouse_blue'', ''light.old_goldie'']
           | random }}
 
           '
@@ -348,10 +299,9 @@
     target:
       entity_id:
       - light.schoolhouse
-      - light.g2
+      - light.schoolhouse_blue
       - light.old_goldie
       - light.g1
-      - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
     data: {}
   - action: light.turn_off
@@ -368,10 +318,9 @@
     target:
       entity_id:
       - light.schoolhouse
-      - light.g2
+      - light.schoolhouse_blue
       - light.old_goldie
       - light.g1
-      - light.living_room_tapo_1_tapo_smart_plug_2
       - light.string_lights
     data: {}
   - action: light.turn_off
@@ -404,7 +353,7 @@
   actions:
   - action: light.turn_on
     target:
-      entity_id: '{{ [''light.g2'', ''light.old_goldie'', ''light.living_room_tapo_1_tapo_smart_plug_2'']
+      entity_id: '{{ [''light.schoolhouse_blue'', ''light.old_goldie'']
         | random }}'
     data: {}
   - choose:
@@ -489,7 +438,6 @@
       - light.swing_ball_lamp
       - light.schoolhouse
       - light.string_lights
-      - light.living_room_tapo_1_tapo_smart_plug_2
     data: {}
   - action: input_boolean.turn_on
     target:
@@ -502,7 +450,6 @@
       - light.swing_ball_lamp
       - light.schoolhouse
       - light.string_lights
-      - light.living_room_tapo_1_tapo_smart_plug_2
     data: {}
   mode: single
 - id: reset_asleep_flag
@@ -601,7 +548,7 @@
       - fan.inovelli_vzm36_fan
   - if:
     - condition: numeric_state
-      entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
+      entity_id: sensor.humidifier_current_consumption
       above: 10
     then:
     - action: fan.turn_on
@@ -613,7 +560,7 @@
   description: When humidifier starts drawing power, turn on Mid Fan
   triggers:
   - trigger: numeric_state
-    entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
+    entity_id: sensor.humidifier_current_consumption
     above: 10
   conditions: []
   actions:
@@ -627,7 +574,7 @@
     actively running
   triggers:
   - trigger: numeric_state
-    entity_id: sensor.yellow_room_tapo_1_bottom_current_consumption
+    entity_id: sensor.humidifier_current_consumption
     below: 10
     for:
       seconds: 10
