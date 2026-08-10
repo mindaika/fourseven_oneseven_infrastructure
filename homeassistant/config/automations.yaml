@@ -858,3 +858,24 @@
     target:
       entity_id: lock.front_door_lock
   mode: single
+- id: '1786622400000'
+  alias: Fan Speed LED Color
+  description: 'Color the Inovelli switch LED bar by ceiling fan speed: low=green,
+    medium=yellow, high=red'
+  triggers:
+  - trigger: state
+    entity_id: fan.inovelli_vzm36_fan
+    attribute: percentage
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr(''fan.inovelli_vzm36_fan'', ''percentage'') | float(0)
+      > 0 }}'
+  actions:
+  - action: number.set_value
+    target:
+      entity_id: number.inovelli_switch_default_all_led_on_color
+    data:
+      value: '{% set p = state_attr(''fan.inovelli_vzm36_fan'', ''percentage'') | float(0)
+        %}{{ 85 if p <= 34 else (42 if p <= 67 else 0) }}'
+  mode: queued
+  max: 10
