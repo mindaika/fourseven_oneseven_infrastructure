@@ -826,3 +826,35 @@
         %}{{ 85 if p <= 34 else (42 if p <= 67 else 0) }}'
   mode: queued
   max: 10
+- id: '1786408603855'
+  alias: Opower data restored
+  description: 'PGE''s Opower tenant has served an HTTP 503 maintenance page since
+    2026-07-04, leaving every elec_account_* sensor unavailable and a gap in the
+    long-term energy statistics. Fires once when real utility data returns.'
+  triggers:
+  - trigger: state
+    entity_id: sensor.elec_account_6537807941_current_bill_electric_usage_to_date
+    from:
+    - unavailable
+    - unknown
+    for: '00:10:00'
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.state | float(-1) >= 0 }}'
+  actions:
+  - action: persistent_notification.create
+    data:
+      title: Opower data restored
+      notification_id: opower_restored
+      message: 'PGE utility data resumed at {{ now().strftime(''%Y-%m-%d %H:%M'') }}
+        with {{ trigger.to_state.state }} kWh billed to date. Statistics stopped
+        2026-07-04. Next: check whether HA re-imported the missing period (the
+        vendor may not return it), then run ha_sync.py repair for whatever range
+        did come back. The pipeline cannot manufacture readings PGE does not send.'
+  - action: notify.mobile_app_canarsie
+    continue_on_error: true
+    data:
+      title: Opower data restored
+      message: '{{ trigger.to_state.state }} kWh billed to date. PGE data is flowing
+        again after the outage that began 2026-07-04.'
+  mode: single
