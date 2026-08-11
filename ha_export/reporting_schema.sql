@@ -372,15 +372,19 @@ GRANT SELECT ON reporting.ha_energy_billing TO ha_api_reader;
 GRANT SELECT ON reporting.ha_source_status  TO ha_api_reader;
 
 -- Explicitly denied everywhere else, including the ingest schema.
--- Verified 2026-08-11: has_schema_privilege is false for homeassistant, oura,
--- dancetrak and website, and has_table_privilege is false for
--- homeassistant.statistic.
-REVOKE ALL ON SCHEMA homeassistant FROM ha_api_reader;
-REVOKE ALL ON SCHEMA oura          FROM ha_api_reader;
-REVOKE ALL ON SCHEMA dancetrak     FROM ha_api_reader;
-REVOKE ALL ON SCHEMA website       FROM ha_api_reader;
-
--- See the matching note in schema.sql: this cannot remove USAGE on `public`,
--- which PostgreSQL grants via the PUBLIC pseudo-role. Table-level access is
--- what actually matters and is denied.
-REVOKE ALL ON SCHEMA public        FROM ha_api_reader;
+-- Revoked only where the schema actually exists. A bare REVOKE on a missing
+-- schema raises, which aborts the rest of this file -- so on a fresh database
+-- without the sibling applications, the grants below this point never ran.
+-- Found by running schema.sql into an empty database rather than assuming.
+DO $$
+DECLARE s text;
+BEGIN
+    FOREACH s IN ARRAY ARRAY['homeassistant', 'oura', 'dancetrak', 'website', 'public'] LOOP
+        IF EXISTS (SELECT FROM pg_namespace WHERE nspname = s) THEN
+            EXECUTE format('REVOKE ALL ON SCHEMA %I FROM ha_api_reader', s);
+        END IF;
+    END LOOP;
+END
+$$;
+-- Same `public` caveat as schema.sql: table-level access is what matters
+-- and is denied.

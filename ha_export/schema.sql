@@ -146,6 +146,32 @@ CREATE TABLE IF NOT EXISTS homeassistant.disagreement_review (
 
 
 -- ---------------------------------------------------------------------------
+-- Per-metric sync watermark: the newest source timestamp a successful run
+-- actually observed for THIS metric.
+--
+-- Reconciliation needs it to compare like with like. Its snapshot is taken at
+-- run time, so it always contains rows Home Assistant compiled after the last
+-- sync; those are legitimately absent from the mirror and must not be reported
+-- as missing. Both the source and destination streams are bounded by this
+-- value, so the comparison domains are identical.
+--
+-- Per-metric rather than a single global maximum: a global one assumes every
+-- statistic advances together within a Home Assistant compile pass, and a
+-- metric that lagged would have its later rows compared against a mirror that
+-- never had the chance to import them.
+--
+-- Derived state maintained by the sync runtime, NOT reviewed configuration --
+-- which is why ha_sync may write it while it may not write the catalog.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS homeassistant.metric_watermark (
+    statistic_id  text PRIMARY KEY
+                  REFERENCES homeassistant.metric_catalog ON DELETE CASCADE,
+    source_max_ts timestamptz NOT NULL,
+    observed_at   timestamptz NOT NULL DEFAULT now()
+);
+
+
+-- ---------------------------------------------------------------------------
 -- Sync history. Pure history: concurrency is enforced by a PostgreSQL advisory
 -- lock, NOT by a uniqueness constraint here.
 --
@@ -232,6 +258,10 @@ GRANT SELECT, INSERT, UPDATE ON homeassistant.statistic TO ha_sync;
 GRANT SELECT, INSERT, UPDATE ON homeassistant.sync_run  TO ha_sync;
 GRANT USAGE, SELECT ON SEQUENCE homeassistant.sync_run_id_seq TO ha_sync;
 
+-- Derived state the runtime maintains, written in the same transaction as the
+-- rows it describes.
+GRANT SELECT, INSERT, UPDATE ON homeassistant.metric_watermark TO ha_sync;
+
 GRANT SELECT ON homeassistant.metric_catalog       TO ha_sync;
 GRANT SELECT ON homeassistant.metric_grain_period  TO ha_sync;
 GRANT SELECT ON homeassistant.disagreement_review  TO ha_sync;
@@ -244,20 +274,26 @@ GRANT UPDATE (grain_review_required) ON homeassistant.metric_catalog TO ha_sync;
 -- grant rather than silently inheriting write access.
 
 -- ha_sync has no business anywhere else in this database.
-REVOKE ALL ON SCHEMA oura      FROM ha_sync;
-REVOKE ALL ON SCHEMA dancetrak FROM ha_sync;
-REVOKE ALL ON SCHEMA website   FROM ha_sync;
+-- Revoked only where the schema actually exists. A bare REVOKE on a missing
+-- schema raises, which aborts the rest of this file -- so on a fresh database
+-- without the sibling applications, the grants below this point never ran.
+-- Found by running schema.sql into an empty database rather than assuming.
+DO $$
+DECLARE s text;
+BEGIN
+    FOREACH s IN ARRAY ARRAY['oura', 'dancetrak', 'website', 'public'] LOOP
+        IF EXISTS (SELECT FROM pg_namespace WHERE nspname = s) THEN
+            EXECUTE format('REVOKE ALL ON SCHEMA %I FROM ha_sync', s);
+        END IF;
+    END LOOP;
+END
+$$;
 
--- NOTE: this next line does NOT remove USAGE on `public`. PostgreSQL grants
--- schema USAGE to the PUBLIC pseudo-role by default, and a per-role REVOKE
--- cannot take away a privilege held that way. Verified 2026-08-11:
--- has_schema_privilege('ha_sync','public','USAGE') is still true afterwards.
---
--- This is acceptable because the real boundary is at table level, and that
--- one holds: ha_sync has SELECT on none of the tables in `public` (which is
--- where Vaultwarden stores its vault) and CREATE on the schema is denied.
--- Closing the schema-level hole would require
---     REVOKE USAGE ON SCHEMA public FROM PUBLIC;
--- which is database-wide and affects every other application, so it is left
--- as a deliberate decision rather than a side effect of this project.
-REVOKE ALL ON SCHEMA public    FROM ha_sync;
+-- NOTE: the loop above cannot remove USAGE on `public`. PostgreSQL grants
+-- that via the PUBLIC pseudo-role and a per-role REVOKE cannot take back a
+-- privilege held that way. The real boundary is at table level and holds:
+-- ha_sync has SELECT on no table in `public` (where Vaultwarden stores its
+-- vault) and CREATE on the schema is denied. Closing the schema-level hole
+-- needs REVOKE USAGE ON SCHEMA public FROM PUBLIC, which is database-wide
+-- and affects every other application -- a deliberate decision, not a side
+-- effect of this project.

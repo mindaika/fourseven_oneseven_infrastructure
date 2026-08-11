@@ -104,6 +104,38 @@ services:
           cpus: '0.25'
           memory: 256M
 
+  # homelab-api - Home Assistant statistics for the dashboard.
+  # Reads Postgres as ha_api_reader (SELECT on the reporting views only) and
+  # never exposes a database credential to the browser.
+  homelab-api:
+    build:
+      context: /home/mindaika/Source/fourseven_oneseven_infrastructure/ha_export
+      dockerfile: Dockerfile
+    container_name: homelab-api
+    restart: unless-stopped
+    environment:
+      - HA_API_DATABASE_URL=postgresql://ha_api_reader:${HA_API_READER_PASSWORD}@192.168.1.54:5432/garbanzodb
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+    ports:
+      - "5007:5007"
+    networks:
+      - apps_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5007/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
 networks:
   apps_network:
     name: apps_network

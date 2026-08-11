@@ -325,6 +325,18 @@ def upsert_metric(pg, statistic_id, rows, resolver) -> dict:
                 cp.write_row(rec)
         cur.execute(UPSERT)
         results = cur.fetchall()
+        # Recorded in the SAME transaction as the rows it describes, so the
+        # watermark can never claim coverage that was rolled back.
+        cur.execute(
+            """INSERT INTO homeassistant.metric_watermark
+                   (statistic_id, source_max_ts, observed_at)
+               VALUES (%s, %s, now())
+               ON CONFLICT (statistic_id) DO UPDATE
+                   SET source_max_ts = GREATEST(
+                           homeassistant.metric_watermark.source_max_ts,
+                           EXCLUDED.source_max_ts),
+                       observed_at = now()""",
+            (statistic_id, max(p[1] for p in payload)))
     pg.commit()
 
     inserted = sum(1 for (ins,) in results if ins)
@@ -356,7 +368,22 @@ def values_equal(a, b, tol=1e-9) -> bool:
 COMPARED_FIELDS = ["mean", "mean_weight", "min", "max", "state", "sum"]
 
 
-def reconcile(pg, sq, statistic_ids, resolver, max_problems=200) -> list[str]:
+def metric_watermarks(pg) -> dict:
+    """Newest source timestamp a successful run actually observed, per metric.
+
+    Per-metric rather than global: a global maximum assumes every statistic
+    advances together within a Home Assistant compile pass, and a metric that
+    lagged would have its later rows compared against a mirror that never had
+    the chance to import them.
+    """
+    with pg.cursor() as cur:
+        cur.execute("""SELECT statistic_id, source_max_ts
+                       FROM homeassistant.metric_watermark""")
+        return dict(cur.fetchall())
+
+
+def reconcile(pg, sq, statistic_ids, resolver, max_problems=200,
+              watermarks: dict | None = None) -> list[str]:
     """EXHAUSTIVE, grain-aware comparison of mirror against source.
 
     Every row is compared, not a sample. An earlier version checked row count,
@@ -382,13 +409,22 @@ def reconcile(pg, sq, statistic_ids, resolver, max_problems=200) -> list[str]:
         return len(problems) >= max_problems
 
     for sid in statistic_ids:
+        # Bound BOTH streams identically. Filtering only the source left
+        # destination rows above the bound in the walk, so a partial run that
+        # committed valid rows past the watermark had them reported as
+        # "ABSENT from source" -- the comparison domains have to match.
+        bound = (watermarks or {}).get(sid)
+
         src_cur = sq.execute(
             """SELECT s.start_ts, s.mean, s.mean_weight, s.min, s.max,
                       s.state, s.sum, s.last_reset_ts
                FROM statistics s
                JOIN statistics_meta m ON s.metadata_id = m.id
                WHERE m.statistic_id = ?
-               ORDER BY s.start_ts""", (sid,))
+                 AND (? IS NULL OR s.start_ts <= ?)
+               ORDER BY s.start_ts""",
+            (sid, bound.timestamp() if bound else None,
+             bound.timestamp() if bound else None))
 
         # Server-side cursor: streams instead of buffering the whole metric.
         with pg.cursor(name=f"recon_{abs(hash(sid))}") as dst_cur:
@@ -398,7 +434,8 @@ def reconcile(pg, sq, statistic_ids, resolver, max_problems=200) -> list[str]:
                           state, sum, last_reset_at
                    FROM homeassistant.statistic
                    WHERE statistic_id = %s
-                   ORDER BY start_at""", (sid,))
+                     AND (%s::timestamptz IS NULL OR start_at <= %s)
+                   ORDER BY start_at""", (sid, bound, bound))
 
             src_it, dst_it = iter(src_cur), iter(dst_cur)
             s = next(src_it, None)
@@ -557,8 +594,6 @@ def cmd_backfill(args, pg, config, db_path, cfg_dir):
 # --------------------------------------------------------------------------
 # cadence audit
 # --------------------------------------------------------------------------
-GRAIN_STEP = {"hour": timedelta(hours=1), "day": timedelta(days=1)}
-
 # Cadences an interval can be recognised as. An interval counts as a cadence
 # when it lands within half..double that cadence, which is wide on purpose:
 # a source reporting daily in LOCAL time produces 23h and 25h intervals in UTC
@@ -894,9 +929,9 @@ def cmd_health(args, pg, config, db_path, cfg_dir):
                WHERE status = 'success' AND mode = 'incremental'""")
         last_success = cur.fetchone()[0]
         cur.execute(
-            """SELECT max(finished_at), max(mode) FROM homeassistant.sync_run
+            """SELECT max(finished_at) FROM homeassistant.sync_run
                WHERE status = 'success'""")
-        any_success, _ = cur.fetchone()
+        any_success = cur.fetchone()[0]
         cur.execute(
             """SELECT count(*) FROM homeassistant.metric_catalog
                WHERE grain_review_required""")
@@ -934,9 +969,13 @@ def cmd_reconcile(args, pg, config, db_path, cfg_dir):
         assert_source_schema(sq)
         available = {r[0] for r in sq.execute(
             "SELECT statistic_id FROM statistics_meta")}
+        marks = metric_watermarks(pg)
+        if marks:
+            print(f"  comparing each metric up to its own sync watermark "
+                  f"({len(marks)} recorded)")
         problems = reconcile(pg, sq,
                              [s for s in wanted if s in available],
-                             GrainResolver(config))
+                             GrainResolver(config), watermarks=marks)
         sq.close()
     if problems:
         print(f"  {len(problems)} problem(s):")
