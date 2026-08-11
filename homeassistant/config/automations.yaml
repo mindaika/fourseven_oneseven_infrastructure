@@ -8,7 +8,7 @@
   actions:
   - action: switch.turn_on
     target:
-      entity_id: switch.yr_north_1_bottom
+      entity_id: switch.yr_west_1_bottom
   mode: single
 - id: '1770434661286'
   alias: Plants Off
@@ -20,7 +20,7 @@
   actions:
   - action: switch.turn_off
     target:
-      entity_id: switch.yr_north_1_bottom
+      entity_id: switch.yr_west_1_bottom
   mode: single
 - id: '1770438411350'
   alias: Night Lights
