@@ -369,7 +369,12 @@ COMPARED_FIELDS = ["mean", "mean_weight", "min", "max", "state", "sum"]
 
 
 def metric_watermarks(pg) -> dict:
-    """Newest source timestamp a successful run actually observed, per metric.
+    """Newest source timestamp COMMITTED per metric.
+
+    Advances with each metric's own transaction, so it reflects what was
+    actually written rather than whether the enclosing run finished. A run that
+    failed on a later metric still leaves earlier metrics correctly watermarked,
+    and those committed rows are exactly the ones reconciliation should check.
 
     Per-metric rather than global: a global maximum assumes every statistic
     advances together within a Home Assistant compile pass, and a metric that

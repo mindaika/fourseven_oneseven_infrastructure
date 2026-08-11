@@ -146,8 +146,14 @@ CREATE TABLE IF NOT EXISTS homeassistant.disagreement_review (
 
 
 -- ---------------------------------------------------------------------------
--- Per-metric sync watermark: the newest source timestamp a successful run
--- actually observed for THIS metric.
+-- Per-metric sync watermark: the newest source timestamp COMMITTED for THIS
+-- metric.
+--
+-- Precisely: it advances with the metric's own transaction, so it reflects the
+-- newest observation actually written -- even if a LATER metric in the same run
+-- failed and the run as a whole is marked failed. That is the behaviour
+-- reconciliation wants: committed rows should be compared, and rows never
+-- written should not be.
 --
 -- Reconciliation needs it to compare like with like. Its snapshot is taken at
 -- run time, so it always contains rows Home Assistant compiled after the last

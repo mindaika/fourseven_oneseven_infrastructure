@@ -121,8 +121,13 @@ def _measurement_sql(view: str, bucket: str) -> str:
                          %(origin)s::timestamptz),
                 %(step)s::interval) g
         )
-        SELECT m.statistic_id, to_char(s.bucket, 'YYYY-MM-DD"T"HH24:MI:SSOF')
-                   AS bucket,
+        -- Explicit "Z", not the OF pattern. OF renders a whole-hour offset as
+        -- "+00", which JavaScript's Date parser rejects outright -- every
+        -- sub-daily bucket label became an Invalid Date and Plotly had no
+        -- x-coordinate to place the point at, so the lines never appeared.
+        SELECT m.statistic_id,
+               to_char(s.bucket AT TIME ZONE 'UTC',
+                       'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS bucket,
                a.mean, a.min, a.max
         FROM series s
         CROSS JOIN unnest(%(ids)s::text[]) AS m(statistic_id)

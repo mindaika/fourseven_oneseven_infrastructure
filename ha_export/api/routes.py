@@ -48,6 +48,17 @@ def _listarg(name: str) -> list[str]:
     return [v for v in (raw.split(",") if raw else []) if v]
 
 
+def _archived_requested() -> bool:
+    """Opt-in access to archived metrics.
+
+    Their history is real and still in the mirror -- three retired temperature
+    sensors and a decommissioned plug -- so it is selectable on request rather
+    than merely described. Default off: an archived feed is stale forever by
+    definition and would sit permanently at the end of every default chart.
+    """
+    return request.args.get("include_archived", "").lower() in ("1", "true", "yes")
+
+
 @bp.get("/api/health")
 def health():
     """Unauthenticated liveness probe for the container healthcheck."""
@@ -89,7 +100,8 @@ def temperature(current_user=None):
     start, end = parse_range(request.args)
     bucket = parse_bucket(request.args)
     with get_conn() as conn:
-        found = _resolve_ids(conn, categories, _listarg("metric"))
+        found = _resolve_ids(conn, categories, _listarg("metric"),
+                             include_inactive=_archived_requested())
         check_size(start, end, bucket, len(found))
         series = measurement_series(
             conn, "ha_temperature", [r[0] for r in found], start, end, bucket)
@@ -105,7 +117,8 @@ def power(current_user=None):
     start, end = parse_range(request.args)
     bucket = parse_bucket(request.args)
     with get_conn() as conn:
-        found = _resolve_ids(conn, ["device_power"], _listarg("metric"))
+        found = _resolve_ids(conn, ["device_power"], _listarg("metric"),
+                             include_inactive=_archived_requested())
         check_size(start, end, bucket, len(found))
         series = measurement_series(
             conn, "ha_power", [r[0] for r in found], start, end, bucket)
@@ -125,7 +138,8 @@ def energy(current_user=None):
 
     start, end = parse_range(request.args, default_days=30)
     with get_conn() as conn:
-        found = _resolve_ids(conn, categories, _listarg("metric"))
+        found = _resolve_ids(conn, categories, _listarg("metric"),
+                             include_inactive=_archived_requested())
         check_size(start, end, "day", len(found))
         series = energy_daily(conn, [r[0] for r in found], start, end)
     return jsonify(unit="kWh", bucket="day",
