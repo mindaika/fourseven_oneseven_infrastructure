@@ -1,0 +1,1002 @@
+# Home Assistant metric allowlist - phase 1 deliverable.
+#
+# This file IS the selection contract. Membership is reviewed by hand;
+# unit metadata is generated from HA so it cannot drift from reality.
+# Discovery by unit_class is an AUDIT that reports unclassified metrics,
+# never a mechanism that adds them.
+#
+# max_plausible_kw is sustained average power, not energy: multiplying by
+# bucket duration gives the kWh ceiling, so one value serves hourly,
+# daily and billing-period grains alike.
+
+
+# ---- environmental_temperature : 5 ----
+
+[[metric]]
+statistic_id = "sensor.my_ecobee_current_temperature"
+category = "environmental_temperature"
+display_name = "My Ecobee Current"
+source = "recorder"
+unit_of_measurement = "°F"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.lil_bee_temperature"
+category = "environmental_temperature"
+display_name = "Lil Bee"
+source = "recorder"
+unit_of_measurement = "°F"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.acurite1_temperature"
+category = "environmental_temperature"
+display_name = "Acurite1"
+source = "recorder"
+unit_of_measurement = "°F"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+is_active = false
+
+[[metric]]
+statistic_id = "sensor.acurite2_temperature"
+category = "environmental_temperature"
+display_name = "Acurite2"
+source = "recorder"
+unit_of_measurement = "°F"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+is_active = false
+
+[[metric]]
+statistic_id = "sensor.tp357s_3d05_temperature"
+category = "environmental_temperature"
+display_name = "Tp357S 3D05"
+source = "recorder"
+unit_of_measurement = "°F"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+is_active = false
+
+# ---- machine_temperature : 7 ----
+
+[[metric]]
+statistic_id = "sensor.hermano_temperature"
+category = "machine_temperature"
+display_name = "Hermano"
+source = "recorder"
+unit_of_measurement = "°C"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.hermano_drive_1_temperature"
+category = "machine_temperature"
+display_name = "Hermano Drive 1"
+source = "recorder"
+unit_of_measurement = "°C"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.hermano_drive_2_temperature"
+category = "machine_temperature"
+display_name = "Hermano Drive 2"
+source = "recorder"
+unit_of_measurement = "°C"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.pi5_composite_temperature"
+category = "machine_temperature"
+display_name = "Pi5 Composite"
+source = "recorder"
+unit_of_measurement = "°C"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.piberry4lite_cpu_thermal_0_temperature"
+category = "machine_temperature"
+display_name = "Piberry4Lite Cpu Thermal 0"
+source = "recorder"
+unit_of_measurement = "°C"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.192_168_1_96_cpu_thermal_0_temperature"
+category = "machine_temperature"
+display_name = "192 168 1 96 Cpu Thermal 0"
+source = "recorder"
+unit_of_measurement = "°C"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.inovelli_vzm31_sn_internal_temperature"
+category = "machine_temperature"
+display_name = "Inovelli Vzm31 Sn Internal"
+source = "recorder"
+unit_of_measurement = "°C"
+unit_class = "temperature"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+# ---- home_energy (lifetime) : 1 ----
+
+[[metric]]
+statistic_id = "opower:pgn_elec_6537807941_energy_consumption"
+category = "home_energy"
+display_name = "Opower pgn elec 6537807941 consumption"
+source = "opower"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 25.0
+default_grain = "hour"
+
+# ---- device_energy (lifetime) : 13 ----
+
+[[metric]]
+statistic_id = "sensor.p1_total_consumption"
+category = "device_energy"
+display_name = "P1"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.p2_total_consumption"
+category = "device_energy"
+display_name = "P2"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.p3_total_consumption"
+category = "device_energy"
+display_name = "P3"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.g1_total_consumption"
+category = "device_energy"
+display_name = "G1"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.schoolhouse_total_consumption"
+category = "device_energy"
+display_name = "Schoolhouse"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.schoolhouse_blue_total_consumption"
+category = "device_energy"
+display_name = "Schoolhouse Blue"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.aqara_g1_summation_delivered"
+category = "device_energy"
+display_name = "Aqara G1"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.aqara_lumi_light_agl001_summation_delivered"
+category = "device_energy"
+display_name = "Aqara Lumi Light Agl001"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 0.05
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.inovelli_vzm31_sn_summation_delivered"
+category = "device_energy"
+display_name = "Inovelli Vzm31 Sn"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.r1_summation_delivered"
+category = "device_energy"
+display_name = "R1"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 0.05
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.r2_summation_delivered"
+category = "device_energy"
+display_name = "R2"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 0.05
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.r3_summation_delivered"
+category = "device_energy"
+display_name = "R3"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 0.05
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.eve_energy_energy_top"
+category = "device_energy"
+display_name = "Eve Energy Energy Top"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "lifetime"
+max_plausible_kw = 2.0
+default_grain = "hour"
+is_active = false
+
+# ---- device_energy (cycle) : 14 ----
+
+[[metric]]
+statistic_id = "sensor.headphones_today_s_consumption"
+category = "device_energy"
+display_name = "Headphones"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.plant_light_today_s_consumption"
+category = "device_energy"
+display_name = "Plant Light"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.computer_today_s_consumption"
+category = "device_energy"
+display_name = "Computer"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.laptop_today_s_consumption"
+category = "device_energy"
+display_name = "Laptop"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.record_player_today_s_consumption"
+category = "device_energy"
+display_name = "Record Player"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.rembrandt_today_s_consumption"
+category = "device_energy"
+display_name = "Rembrandt"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.humidifier_today_s_consumption"
+category = "device_energy"
+display_name = "Humidifier"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.mid_fan_today_s_consumption"
+category = "device_energy"
+display_name = "Mid Fan"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.alarm_clock_today_s_consumption"
+category = "device_energy"
+display_name = "Alarm Clock"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.bedroom_tapo_1_top_today_s_consumption"
+category = "device_energy"
+display_name = "Bedroom Tapo 1 Top"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.bedroom_tapo_1_bottom_today_s_consumption"
+category = "device_energy"
+display_name = "Bedroom Tapo 1 Bottom"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.tall_bookshelf_right_top_today_s_consumption"
+category = "device_energy"
+display_name = "Tall Bookshelf Right Top"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.tall_bookshelf_right_bottom_today_s_consumption"
+category = "device_energy"
+display_name = "Tall Bookshelf Right Bottom"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.yr_west_1_bottom_today_s_consumption"
+category = "device_energy"
+display_name = "Yr West 1 Bottom"
+source = "recorder"
+unit_of_measurement = "kWh"
+unit_class = "energy"
+mean_type = 0
+has_sum = true
+energy_role = "cycle"
+max_plausible_kw = 2.0
+default_grain = "hour"
+
+# ---- device_power : 27 ----
+
+[[metric]]
+statistic_id = "sensor.alarm_clock_current_consumption"
+category = "device_power"
+display_name = "Alarm Clock"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.aqara_g1_power"
+category = "device_power"
+display_name = "Aqara G1"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.aqara_lumi_light_agl001_power"
+category = "device_power"
+display_name = "Aqara Lumi Light Agl001"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.bedroom_tapo_1_bottom_current_consumption"
+category = "device_power"
+display_name = "Bedroom Tapo 1 Bottom"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.bedroom_tapo_1_top_current_consumption"
+category = "device_power"
+display_name = "Bedroom Tapo 1 Top"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.computer_current_consumption"
+category = "device_power"
+display_name = "Computer"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.eve_energy_power_top"
+category = "device_power"
+display_name = "Eve Energy Power Top"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+is_active = false
+
+[[metric]]
+statistic_id = "sensor.g1_current_consumption"
+category = "device_power"
+display_name = "G1"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.headphones_current_consumption"
+category = "device_power"
+display_name = "Headphones"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.humidifier_current_consumption"
+category = "device_power"
+display_name = "Humidifier"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.inovelli_vzm31_sn_power"
+category = "device_power"
+display_name = "Inovelli Vzm31 Sn"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.laptop_current_consumption"
+category = "device_power"
+display_name = "Laptop"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.mid_fan_current_consumption"
+category = "device_power"
+display_name = "Mid Fan"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.p1_current_consumption"
+category = "device_power"
+display_name = "P1"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.p2_current_consumption"
+category = "device_power"
+display_name = "P2"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.p3_current_consumption"
+category = "device_power"
+display_name = "P3"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.plant_light_current_consumption"
+category = "device_power"
+display_name = "Plant Light"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.r1_instantaneous_demand"
+category = "device_power"
+display_name = "R1"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.r2_instantaneous_demand"
+category = "device_power"
+display_name = "R2"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.r3_instantaneous_demand"
+category = "device_power"
+display_name = "R3"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.record_player_current_consumption"
+category = "device_power"
+display_name = "Record Player"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.rembrandt_current_consumption"
+category = "device_power"
+display_name = "Rembrandt"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.schoolhouse_blue_current_consumption"
+category = "device_power"
+display_name = "Schoolhouse Blue"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.schoolhouse_current_consumption"
+category = "device_power"
+display_name = "Schoolhouse"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.tall_bookshelf_right_bottom_current_consumption"
+category = "device_power"
+display_name = "Tall Bookshelf Right Bottom"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.tall_bookshelf_right_top_current_consumption"
+category = "device_power"
+display_name = "Tall Bookshelf Right Top"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+[[metric]]
+statistic_id = "sensor.yr_west_1_bottom_current_consumption"
+category = "device_power"
+display_name = "Yr West 1 Bottom"
+source = "recorder"
+unit_of_measurement = "W"
+unit_class = "power"
+mean_type = 1
+has_sum = false
+default_grain = "hour"
+
+
+# ---- reviewed exclusions : 38 ----
+# Present in HA with a relevant unit_class, deliberately not exported.
+
+[[excluded]]
+statistic_id = "opower:pgn_elec_6537807941_energy_compensation"
+reason = "USD cost/compensation, not energy; out of scope for this phase"
+
+[[excluded]]
+statistic_id = "opower:pgn_elec_6537807941_energy_cost"
+reason = "USD cost/compensation, not energy; out of scope for this phase"
+
+[[excluded]]
+statistic_id = "opower:pgn_elec_6537807941_energy_return"
+reason = "all-zero across 5020 rows (max_sum=0.0); no solar export on this account"
+
+[[excluded]]
+statistic_id = "sensor.alarm_clock_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.bedroom_tapo_1_bottom_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.bedroom_tapo_1_top_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.computer_energy_this_month_wh"
+reason = "monthly cycle over the same source as sensor.computer_today_s_consumption"
+
+[[excluded]]
+statistic_id = "sensor.computer_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.elec_account_6537807941_current_bill_electric_forecasted_usage"
+reason = "opower-derived billing sensor; canonical series is opower:*_energy_consumption"
+
+[[excluded]]
+statistic_id = "sensor.elec_account_6537807941_current_bill_electric_usage_to_date"
+reason = "opower-derived billing sensor; canonical series is opower:*_energy_consumption"
+
+[[excluded]]
+statistic_id = "sensor.elec_account_6537807941_typical_monthly_electric_usage"
+reason = "opower-derived billing sensor; canonical series is opower:*_energy_consumption"
+
+[[excluded]]
+statistic_id = "sensor.eve_monthly_cycle"
+reason = "monthly cycle over the same source as sensor.computer_today_s_consumption"
+
+[[excluded]]
+statistic_id = "sensor.g1_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.g1_today_s_consumption"
+reason = "superseded by sensor.g1_total_consumption (lifetime meter)"
+
+[[excluded]]
+statistic_id = "sensor.headphones_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.humidifier_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.laptop_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.mid_fan_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.p1_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.p1_today_s_consumption"
+reason = "superseded by sensor.p1_total_consumption (lifetime meter)"
+
+[[excluded]]
+statistic_id = "sensor.p2_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.p2_today_s_consumption"
+reason = "superseded by sensor.p2_total_consumption (lifetime meter)"
+
+[[excluded]]
+statistic_id = "sensor.p3_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.p3_today_s_consumption"
+reason = "superseded by sensor.p3_total_consumption (lifetime meter)"
+
+[[excluded]]
+statistic_id = "sensor.pi5_cpu_thermal_0_temperature"
+reason = "1-row artifact of a renamed integration; no usable history"
+
+[[excluded]]
+statistic_id = "sensor.pi5_rp1_adc_0_temperature"
+reason = "1-row artifact of a renamed integration; no usable history"
+
+[[excluded]]
+statistic_id = "sensor.pi5_sensor_1_temperature"
+reason = "1-row artifact of a renamed integration; no usable history"
+
+[[excluded]]
+statistic_id = "sensor.pi5_sensor_2_temperature"
+reason = "1-row artifact of a renamed integration; no usable history"
+
+[[excluded]]
+statistic_id = "sensor.plant_light_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.record_player_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.rembrandt_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.schoolhouse_blue_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.schoolhouse_blue_today_s_consumption"
+reason = "superseded by sensor.schoolhouse_blue_total_consumption (lifetime meter)"
+
+[[excluded]]
+statistic_id = "sensor.schoolhouse_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.schoolhouse_today_s_consumption"
+reason = "superseded by sensor.schoolhouse_total_consumption (lifetime meter)"
+
+[[excluded]]
+statistic_id = "sensor.tall_bookshelf_right_bottom_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.tall_bookshelf_right_top_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+[[excluded]]
+statistic_id = "sensor.yr_west_1_bottom_this_month_s_consumption"
+reason = "monthly cycle duplicate; daily cycle is the finer-grained source"
+
+
+# ---- opower grain periods ----
+# Half-open [valid_from, valid_until). Verified against row magnitudes,
+# not spacing: 2025-11-14 has state=408.0 (a billing period), while
+# 2025-11-15 has state=7.095 (the first true day).
+# Expected partition: 75 billing_period / 26 day / 4919 hour = 5020.
+
+[[grain_period]]
+statistic_id = "opower:pgn_elec_6537807941_energy_consumption"
+valid_from = "-infinity"
+valid_until = "2025-11-15T08:00:00Z"
+grain = "billing_period"
+
+[[grain_period]]
+statistic_id = "opower:pgn_elec_6537807941_energy_consumption"
+valid_from = "2025-11-15T08:00:00Z"
+valid_until = "2025-12-11T08:00:00Z"
+grain = "day"
+
+[[grain_period]]
+statistic_id = "opower:pgn_elec_6537807941_energy_consumption"
+valid_from = "2025-12-11T08:00:00Z"
+valid_until = false
+grain = "hour"

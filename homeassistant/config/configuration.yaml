@@ -18,6 +18,26 @@ http:
     - 172.19.0.0/16
   login_attempts_threshold: 10
 
+# Recorder: exclude ephemeral Docker network interfaces.
+#
+# Every container restart creates a veth interface with a new random name,
+# and the system-monitor integration turns each into a permanent statistic
+# that logs a few rows and then goes dead forever. As of 2026-08-11 that is
+# 1,212 dead metrics and 66,774 orphaned statistics rows, and the set grows
+# without bound.
+#
+# This stops future recording only - existing rows are unaffected and are
+# left in place deliberately (removal is destructive and unnecessary).
+#
+# Voltage/amperage sensors are NOT excluded: they are noisy but are useful
+# electrical diagnostics, and are unrelated to the veth problem.
+recorder:
+  exclude:
+    entity_globs:
+      - sensor.*_veth*
+      - sensor.pi5_br_*
+      - sensor.pi4_br_*
+
 # Load frontend themes from the themes folder
 frontend:
   themes: !include_dir_merge_named themes
