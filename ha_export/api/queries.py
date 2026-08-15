@@ -16,6 +16,10 @@ RANGE SEMANTICS -- two different contracts, deliberately:
   sub-daily buckets   INSTANT range, half-open [start, end).
                       Every bucket overlapping the range is returned, including
                       the partial one containing `end - epsilon`.
+                      Edges are LOCAL wall clock, so a 6-hour bucket starts at
+                      00/06/12/18 local rather than wherever those land after a
+                      UTC offset. Selection is still by instant -- only the
+                      grid the observations are binned onto is local.
 
   bucket=day          LOCAL CALENDAR range, half-open [start_date, end_date),
                       where the dates are the local dates of `start` and `end`.
@@ -33,15 +37,26 @@ requested instants.
 from __future__ import annotations
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from .limits import BUCKETS
 
 # Local time is applied ONLY at this boundary. Everything is stored in UTC.
 LOCAL_TZ = "America/Los_Angeles"
+_LOCAL = ZoneInfo(LOCAL_TZ)
 
 # Sub-daily buckets: date_bin with an explicit origin so bucket edges are
 # stable regardless of the requested start.
-_ORIGIN = "2000-01-01 00:00:00+00"
+#
+# The origin is a LOCAL wall clock, and observations are binned after conversion
+# to local time. A fixed UTC instant cannot do this job: it aligns to local
+# midnight in at most one DST phase, so an origin chosen to look right in
+# January puts every 6-hour bucket at 01/07/13/19 for the eight months of PDT.
+# Binning on the wall clock is right in both phases. The cost is that a bucket
+# spanning a DST transition covers 5 or 7 real hours instead of 6 -- the same
+# trade `bucket=day` already makes for 23- and 25-hour local days, and the same
+# one a reader means by "6am".
+_ORIGIN = "2000-01-01 00:00:00"
 
 # Local-day bounds as instants, so the WHERE clause stays sargable on start_at
 # rather than wrapping it in a timezone conversion.
@@ -99,9 +114,13 @@ def _measurement_sql(view: str, bucket: str) -> str:
 
     return f"""
         WITH agg AS (
+            -- Filter by INSTANT, bin by LOCAL wall clock. The WHERE clause is
+            -- left on the raw start_at so it stays sargable; only the binning
+            -- expression pays for the conversion.
             SELECT statistic_id,
-                   date_bin(%(step)s::interval, start_at, %(origin)s::timestamptz)
-                       AS bucket,
+                   date_bin(%(step)s::interval,
+                            start_at AT TIME ZONE %(tz)s,
+                            %(origin)s::timestamp) AS bucket,
                    {value_cols}
             FROM reporting.{view}
             WHERE statistic_id = ANY(%(ids)s::text[])
@@ -114,27 +133,50 @@ def _measurement_sql(view: str, bucket: str) -> str:
             -- range is unaligned: for 00:30->02:30 hourly it emitted 00:00 and
             -- 01:00 while the 02:00 bucket was aggregated and then discarded,
             -- losing real observations without any error.
+            --
+            -- Generated on the same local grid the aggregate is binned onto:
+            -- every observation in [start, end) has a local time within
+            -- [start_local, (end - epsilon)_local], so its bin is always one
+            -- the series emits and no aggregate is computed then dropped.
             SELECT g AS bucket
             FROM generate_series(
-                date_bin(%(step)s::interval, %(start)s, %(origin)s::timestamptz),
-                date_bin(%(step)s::interval, %(end)s - interval '1 microsecond',
-                         %(origin)s::timestamptz),
+                date_bin(%(step)s::interval, %(start)s AT TIME ZONE %(tz)s,
+                         %(origin)s::timestamp),
+                date_bin(%(step)s::interval,
+                         (%(end)s - interval '1 microsecond') AT TIME ZONE %(tz)s,
+                         %(origin)s::timestamp),
                 %(step)s::interval) g
         )
-        -- Explicit "Z", not the OF pattern. OF renders a whole-hour offset as
-        -- "+00", which JavaScript's Date parser rejects outright -- every
-        -- sub-daily bucket label became an Invalid Date and Plotly had no
-        -- x-coordinate to place the point at, so the lines never appeared.
-        SELECT m.statistic_id,
-               to_char(s.bucket AT TIME ZONE 'UTC',
-                       'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS bucket,
-               a.mean, a.min, a.max
+        -- The bucket is already a local wall clock; _bucket_label re-attaches
+        -- the offset that makes it an instant again. Doing that here would mean
+        -- rendering a zone-aware offset in SQL, which to_char cannot do for
+        -- anything but the session timezone.
+        SELECT m.statistic_id, s.bucket, a.mean, a.min, a.max
         FROM series s
         CROSS JOIN unnest(%(ids)s::text[]) AS m(statistic_id)
         LEFT JOIN agg a ON a.bucket = s.bucket
                        AND a.statistic_id = m.statistic_id
         ORDER BY m.statistic_id, s.bucket
     """
+
+
+def _bucket_label(b: datetime) -> str:
+    """Stamp the zone onto a naive local bucket edge.
+
+    Plotly has no timezone support: dateTime2ms parses the fields of a date
+    string and throws the offset away, so the wall clock in the string is
+    verbatim what the axis prints. Labelling in UTC therefore put a 6pm room
+    temperature peak at 1am -- the data was right and only the axis lied.
+
+    The offset is still carried on the wire. Plotly ignores it, but it is what
+    makes the value an instant rather than an ambiguous local reading, which
+    matters for one hour every autumn and for any consumer that is not Plotly.
+    That hour is also why this is `replace` and not `astimezone`: the value
+    arrives as a wall clock with no zone, so the zone is ATTACHED, never
+    converted. fold=0 resolves the repeated hour to its first occurrence, which
+    is the one the bucket's observations start in.
+    """
+    return b.replace(tzinfo=_LOCAL).isoformat()
 
 
 def measurement_series(conn, view: str, ids: list[str], start: datetime,
@@ -149,12 +191,16 @@ def measurement_series(conn, view: str, ids: list[str], start: datetime,
         cur.execute(_measurement_sql(view, bucket), params)
         rows = cur.fetchall()
 
+    # Day buckets are already local calendar dates and arrive as text; every
+    # other bucket arrives as an instant and is labelled here.
+    label = str if step is None else _bucket_label
+
     out: dict[str, list] = {sid: [] for sid in ids}
     for sid, b, mean, mn, mx in rows:
         # Explicit nulls, never omitted points: Plotly's connectgaps=false only
         # breaks a line where the trace actually contains a null. Dropping the
         # empty buckets would draw a straight line across an outage.
-        out[sid].append({"bucket": b,
+        out[sid].append({"bucket": label(b),
                          "mean": float(mean) if mean is not None else None,
                          "min": float(mn) if mn is not None else None,
                          "max": float(mx) if mx is not None else None})

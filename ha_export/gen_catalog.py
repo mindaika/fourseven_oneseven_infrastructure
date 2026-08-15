@@ -74,6 +74,30 @@ DEVICE_POWER = [
 INACTIVE = ({"sensor.eve_energy_power_top", "sensor.eve_energy_energy_top"}
             | set(ENV_TEMP_DEAD))
 
+# Device renames, reviewed by hand against core.device_registry.
+#
+# An entity_id freezes the device name in force when the entity was created and
+# never follows a later rename, so `label()`'s slug fallback keeps reporting a
+# plug by whatever it was called years ago. statistics_meta.name is NULL for
+# every one of these, so there is nothing upstream to correct it -- HA knows the
+# current name only in the device registry, which the recorder database does
+# not carry. Keyed by the device slug in the id, so one entry fixes that
+# device's power and energy metrics together.
+#
+# The statistic_id itself is deliberately left alone: it is the join key to
+# years of history, and renaming it would orphan every row already imported.
+# Two of these are a straight SWAP -- the plant light moved to the YR West 1
+# bottom outlet, and the plug whose id still says `plant_light` is now YR North
+# 1 Bottom -- so correcting one without the other yields two identical labels.
+DISPLAY_NAME = {
+    "aqara_lumi_light_agl001": "Aqara G2",
+    "bedroom_tapo_1_bottom": "Bluesound",
+    "bedroom_tapo_1_top": "Bedside Lamp",
+    "inovelli_vzm31_sn": "Inovelli Switch",
+    "plant_light": "YR North 1 Bottom",
+    "yr_west_1_bottom": "Plant Light",
+}
+
 # Reviewed exclusions. Recording WHY lets the discovery audit alarm only on
 # genuinely new metrics instead of re-reporting settled decisions forever.
 LIFETIME_DEVICES = ("g1", "p1", "p2", "p3", "schoolhouse", "schoolhouse_blue")
@@ -123,13 +147,17 @@ def tomlstr(v):
 
 
 def label(sid, ha_name):
-    if ha_name:
-        return ha_name
     base = sid.split(".", 1)[1] if "." in sid else sid
     for suf in ("_today_s_consumption", "_total_consumption",
                 "_summation_delivered", "_current_consumption",
                 "_instantaneous_demand", "_temperature", "_power"):
         base = base.removesuffix(suf)
+    # A reviewed override outranks HA, which is why it exists: the slug is
+    # stale and statistics_meta has nothing better to offer.
+    if base in DISPLAY_NAME:
+        return DISPLAY_NAME[base]
+    if ha_name:
+        return ha_name
     return base.replace("_", " ").title()
 
 

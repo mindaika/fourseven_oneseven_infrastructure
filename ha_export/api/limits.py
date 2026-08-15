@@ -25,9 +25,10 @@ MAX_TOTAL_POINTS = 20000  # buckets * metrics
 MAX_RANGE_DAYS = 3660     # ~10 years, enough for the whole opower history
 MAX_BILLING_ROWS = 2000   # native-grain rows per billing request
 
-# Must match queries.LOCAL_TZ; imported there rather than duplicated would be
-# circular, so it is asserted equal by a test instead.
+# Must match queries.LOCAL_TZ and queries._ORIGIN; importing them would be
+# circular, so they are duplicated here and asserted equal by a test instead.
 LOCAL_TZ = "America/Los_Angeles"
+ORIGIN = datetime(2000, 1, 1)
 
 
 class BadRequest(Exception):
@@ -88,20 +89,28 @@ def bucket_count(start: datetime, end: datetime, bucket: str) -> int:
     request than the one actually executed.
 
       sub-daily : instant range, every bucket overlapping [start, end),
-                  i.e. through the bucket containing end - epsilon
+                  i.e. through the bucket containing end - epsilon, binned on
+                  the LOCAL wall clock from ORIGIN
       day       : local calendar days [start_date, end_date), so complete days
                   only and the day containing `end` excluded
     """
+    tz = ZoneInfo(LOCAL_TZ)
     step = BUCKETS[bucket]
     if step is None:
-        tz = ZoneInfo(LOCAL_TZ)
         d0 = start.astimezone(tz).date()
         d1 = end.astimezone(tz).date()
         return max((d1 - d0).days, 0)
 
-    secs = step.total_seconds()
-    first = int(start.timestamp() // secs)
-    last = int((end - timedelta(microseconds=1)).timestamp() // secs)
+    # Counted on the local grid, not the epoch grid. A range crossing a DST
+    # transition contains one more or one fewer local bucket than its elapsed
+    # time implies, and counting in UTC would guard a different request than
+    # the one date_bin actually executes.
+    def local_bin(dt: datetime) -> int:
+        naive = dt.astimezone(tz).replace(tzinfo=None)
+        return (naive - ORIGIN) // step
+
+    first = local_bin(start)
+    last = local_bin(end - timedelta(microseconds=1))
     return max(last - first + 1, 0)
 
 
