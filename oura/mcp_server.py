@@ -15,17 +15,21 @@ Security model (by design, not just convention):
   - Runs on the Docker network local to the Pi (infra_network), talking to
     Postgres by container name — never touches the LAN-exposed Postgres
     port.
-  - Reachable only via nginx's oura-mcp.garbanzo.monster block, which is
-    itself LAN-restricted (allow 192.168.1.0/24; deny all;) — this has a
-    real public DNS name and Let's Encrypt cert (required for OAuth's
-    RFC 8414 issuer rules and for Claude Desktop to trust it), but requests
-    from outside the home network are rejected by nginx before they ever
-    reach this process.
-  - OAuth (see oauth_provider.py) is a third, outermost layer on top of
-    the two above, required by Claude Desktop for any remote connector —
-    it is not the thing actually enforcing read-only access; the database
-    grants are.
+  - Reached via nginx's oura-mcp.garbanzo.monster block, which is
+    INTERNET-FACING, not LAN-restricted. The allowlist that used to be
+    there was removed on 2026-07-25 because remote-connector OAuth needs
+    the vendor's cloud backend to reach /token directly, and a LAN rule
+    silently broke the token exchange (see the comment on that server
+    block for the full rationale). Anyone on the internet can reach this
+    process; the OAuth gate below is what stops them, so treat it as
+    load-bearing rather than as defence in depth.
+  - OAuth (see oauth_provider.py) is therefore the *only* thing standing
+    between the open internet and this server's tools — a single username
+    and password from the environment. It still isn't what enforces
+    read-only access (the database grants are), but it is now the outer
+    perimeter, not a third redundant layer.
 """
+import logging
 import os
 
 import psycopg
@@ -38,6 +42,12 @@ from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
 from mcp.server.fastmcp import FastMCP
 
 from oauth_provider import SingleUserOAuthProvider
+
+# Uvicorn only configures its own loggers, leaving this app's modules with no
+# handler — so oauth_provider's INFO lines (how many client registrations and
+# tokens were restored at boot) would silently vanish, which is exactly the
+# diagnostic you want when a connector starts failing to authorize.
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s - %(message)s")
 
 DATABASE_URL = os.environ["CLAUDE_READER_DATABASE_URL"]
 SERVER_URL = os.environ.get("OURA_MCP_SERVER_URL", "https://oura-mcp.garbanzo.monster")
@@ -56,6 +66,12 @@ oauth_provider = SingleUserOAuthProvider(
     # client that does support it.
     static_client_id=os.environ.get("OURA_MCP_STATIC_CLIENT_ID"),
     static_client_secret=os.environ.get("OURA_MCP_STATIC_CLIENT_SECRET"),
+    # Survives restarts. Dynamically-registered clients (ChatGPT/Codex
+    # connectors, Claude Desktop) cache their client_id forever and never
+    # re-register, so without this a reboot permanently breaks them until
+    # the connector is deleted and re-added by hand. Bind-mounted; see
+    # compose.yaml.
+    state_path=os.environ.get("OURA_MCP_STATE_PATH", "/data/oauth_state.json"),
 )
 
 mcp = FastMCP(
@@ -93,7 +109,7 @@ async def login_page_handler(request: Request) -> Response:
     state = request.query_params.get("state")
     if not state:
         raise HTTPException(400, "Missing state parameter")
-    return await oauth_provider.get_login_page(state)
+    return await oauth_provider.get_login_page(state, error=request.query_params.get("error") == "1")
 
 
 @mcp.custom_route("/login/callback", methods=["POST"])
