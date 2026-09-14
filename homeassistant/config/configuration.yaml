@@ -11,13 +11,6 @@ input_boolean:
     name: Asleep
     icon: mdi:sleep
 
-# Reverse proxy configuration
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 172.19.0.0/16
-  login_attempts_threshold: 10
-
 # Recorder: exclude ephemeral Docker network interfaces.
 #
 # Every container restart creates a veth interface with a new random name,
