@@ -636,6 +636,59 @@
       sequence:
       - action: script.bedside_sunrise
   mode: single
+- id: bedroom_switch_gestures
+  alias: Bedroom Switch Gestures
+  description: 'Inovelli bedroom switch: hold down = off (overrides the binding''s
+    release-to-8%), double down = off, double up = 100%'
+  triggers:
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_ieee: f0:44:d3:ff:fe:6d:1a:ac
+      command: button_1_release
+    id: 'off'
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_ieee: f0:44:d3:ff:fe:6d:1a:ac
+      command: button_1_double
+    id: 'off'
+  - trigger: event
+    event_type: zha_event
+    event_data:
+      device_ieee: f0:44:d3:ff:fe:6d:1a:ac
+      command: button_2_double
+    id: full
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.inovelli_vzm36_light
+          - light.inovelli_vzm31_sn
+      - delay:
+          seconds: 1
+      - action: light.turn_off
+        target:
+          entity_id: light.inovelli_vzm36_light
+    - conditions:
+      - condition: trigger
+        id: full
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id:
+          - light.inovelli_vzm36_light
+          - light.inovelli_vzm31_sn
+        data:
+          brightness: 255
+  mode: queued
+  max: 5
 - id: spring_equinox_yard
   alias: Spring Equinox Yard
   description: Apply Spring Yard scene on the first day of spring (March 20)
