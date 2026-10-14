@@ -402,7 +402,7 @@
   description: Turn on the Yamaha receiver when Shairport Sync (WhaaM) starts playing
   triggers:
   - trigger: state
-    entity_id: binary_sensor.shairport_sync_homewide_playing
+    entity_id: binary_sensor.shairport_sync_whaam_playing
     to: 'on'
   actions:
   - action: media_player.turn_on
