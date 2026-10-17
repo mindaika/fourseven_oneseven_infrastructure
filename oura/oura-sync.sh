@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Weekly Oura Ring data sync.
-# Pulls everything since the last successful run (see oura/sync.py and the
+# Twice-daily Oura Ring data sync (see crontab).
+# Pulls everything since the last successful run (minus a short overlap) (see oura/sync.py and the
 # oura.sync_log table) and upserts it into the oura schema in garbanzodb.
 
 set -euo pipefail

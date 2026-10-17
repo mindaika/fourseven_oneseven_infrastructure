@@ -26,6 +26,11 @@ ENV_PATH = Path(__file__).parent / ".env"
 # sync_log history exists). Subsequent runs pick up from the last window_end.
 INITIAL_BACKFILL_DAYS = int(os.environ.get("OURA_INITIAL_BACKFILL_DAYS", "90"))
 
+# Re-pull this many days before the last window_end on each run, so partial
+# days (today's activity/stress) and late-revised scores get refreshed. All
+# writes are upserts, so the overlap is harmless.
+RESYNC_DAYS = int(os.environ.get("OURA_RESYNC_DAYS", "2"))
+
 
 def load_env():
     if ENV_PATH.exists():
@@ -37,10 +42,12 @@ def load_env():
             os.environ.setdefault(key.strip(), value.strip())
 
 
-def fetch_paginated(session, endpoint, start_date, end_date):
+def fetch_paginated(session, endpoint, start_date, end_date, params=None):
     """Yield every record from an Oura v2 usercollection endpoint, following
-    next_token pagination."""
-    params = {"start_date": start_date.isoformat(), "end_date": end_date.isoformat()}
+    next_token pagination. Pass params to override the default date range."""
+    if params is None:
+        params = {"start_date": start_date.isoformat(), "end_date": end_date.isoformat()}
+    params = dict(params)
     while True:
         resp = session.get(f"{API_BASE}/{endpoint}", params=params, timeout=30)
         resp.raise_for_status()
@@ -67,7 +74,9 @@ def last_window_end(conn, endpoint):
             (endpoint,),
         )
         row = cur.fetchone()
-    return row[0] if row else date.today() - timedelta(days=INITIAL_BACKFILL_DAYS)
+    if row:
+        return row[0] - timedelta(days=RESYNC_DAYS)
+    return date.today() - timedelta(days=INITIAL_BACKFILL_DAYS)
 
 
 def start_sync_log(conn, endpoint, window_start, window_end):
@@ -168,10 +177,27 @@ def sync_daily_stress(conn, session, start_date, end_date):
     return count
 
 
+# /heartrate ignores start_date/end_date (it silently returns the last ~24h)
+# and caps the datetime range per request, so walk the window in chunks.
+HEART_RATE_CHUNK_DAYS = 30
+
+
+def heart_rate_records(session, start_date, end_date):
+    chunk_start = start_date
+    while chunk_start <= end_date:
+        chunk_end = min(chunk_start + timedelta(days=HEART_RATE_CHUNK_DAYS), end_date + timedelta(days=1))
+        params = {"start_datetime": f"{chunk_start.isoformat()}T00:00:00",
+                  "end_datetime": f"{chunk_end.isoformat()}T00:00:00"}
+        yield from fetch_paginated(session, "heartrate", None, None, params=params)
+        chunk_start = chunk_end
+        if chunk_start > end_date:
+            return
+
+
 def sync_heart_rate(conn, session, start_date, end_date):
     count = 0
     with conn.cursor() as cur:
-        for rec in fetch_paginated(session, "heartrate", start_date, end_date):
+        for rec in heart_rate_records(session, start_date, end_date):
             cur.execute(
                 """INSERT INTO oura.heart_rate ("timestamp", source, bpm, synced_at)
                    VALUES (%s, %s, %s, now())
