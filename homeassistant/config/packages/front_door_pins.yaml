@@ -1,0 +1,52 @@
+# Front door keypad PIN codes, sourced from secrets.yaml.
+#
+# Lives in its own package rather than scripts.yaml: a !secret tag inside
+# scripts.yaml breaks saving from the UI script editor for every script.
+#
+# Each slot's PIN comes from secrets.yaml (gitignored). An empty string means
+# "leave this slot alone" - the script never clears a slot. Quote PINs in
+# secrets.yaml ("0123", not 0123) so leading zeros survive YAML parsing.
+#
+# The lock (Yale YRD410-F, ZHA) cannot report back which codes it holds, so
+# running this overwrites whatever is in the listed slots, including codes
+# entered at the keypad. PINs are visible to admins in this script's traces.
+#
+# This lock rejects slot 1 (Zigbee user ID 0) with a FAILURE status. ZHA
+# discards that status, so the script still reports success - keep slot 1
+# empty and use slot 2 onwards.
+
+script:
+  front_door_sync_pins:
+    alias: Front Door - Sync PIN Codes
+    description: Push the PIN codes from secrets.yaml to the front door keypad
+    icon: mdi:lock-smart
+    mode: single
+    variables:
+      pins:
+        - slot: 1
+          code: !secret front_door_pin_slot_1
+        - slot: 2
+          code: !secret front_door_pin_slot_2
+        - slot: 3
+          code: !secret front_door_pin_slot_3
+      to_set: "{{ pins | selectattr('code') | list }}"
+      invalid: >
+        {% set ns = namespace(bad=[]) %}
+        {% for p in to_set if not (p.code | string) is match('^\d{4,8}$') %}
+          {% set ns.bad = ns.bad + [p.slot] %}
+        {% endfor %}
+        {{ ns.bad }}
+    sequence:
+      - if: "{{ invalid | count > 0 }}"
+        then:
+          - stop: "PIN for slot(s) {{ invalid | join(', ') }} must be 4-8 digits"
+            error: true
+      - repeat:
+          for_each: "{{ to_set }}"
+          sequence:
+            - action: zha.set_lock_user_code
+              target:
+                entity_id: lock.front_door_lock
+              data:
+                code_slot: "{{ repeat.item.slot }}"
+                user_code: "{{ repeat.item.code | string }}"
