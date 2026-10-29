@@ -9,9 +9,11 @@
 --
 -- Each view pulls the handful of fields actually useful for analysis out
 -- of the jsonb payload and leaves noisy raw arrays (minute-by-minute MET,
--- second-by-second sleep phase strings, per-sample heart rate arrays from
--- sessions, etc.) out entirely — those are ingest/debugging detail, not
--- something a reporting query needs.
+-- per-sample heart rate arrays from sessions, etc.) out entirely — those
+-- are ingest/debugging detail, not something a reporting query needs. The
+-- one exception is the 5-minute sleep stage timeline (sleep_phase_5_min),
+-- which is exposed raw on oura_sleep_periods and decoded into
+-- oura_sleep_awakenings for analyzing awakenings during the night.
 --
 -- Idempotent: safe to re-run (CREATE OR REPLACE VIEW).
 
@@ -84,8 +86,68 @@ SELECT
     (data->>'light_sleep_duration')::int        AS light_sleep_duration_seconds,
     (data->>'awake_time')::int                  AS awake_time_seconds,
     (data->>'restless_periods')::int            AS restless_periods,
-    (data->'readiness'->>'score')::int          AS readiness_score
+    (data->'readiness'->>'score')::int          AS readiness_score,
+    -- One character per 5-minute slot from bedtime_start: 1 = deep,
+    -- 2 = light, 3 = REM, 4 = awake. Slot i (1-based) covers
+    -- bedtime_start + (i-1)*5min to bedtime_start + i*5min. Appended last
+    -- because CREATE OR REPLACE VIEW can only add columns at the end.
+    data->>'sleep_phase_5_min'                  AS sleep_phase_5_min
 FROM oura.sleep_periods;
+
+-- One row per awakening: a run of consecutive awake ('4') slots in
+-- sleep_phase_5_min, excluding the awake time before the first non-awake
+-- slot (falling asleep) and after the last one (getting up). Durations are
+-- 5-minute-resolution estimates (a run of n slots = n*5 minutes), not
+-- exact. *_local columns are wall-clock time in the timezone the ring
+-- recorded that night in (taken from the offset in Oura's raw timestamp),
+-- so time-of-day analysis stays correct across DST and travel.
+CREATE OR REPLACE VIEW reporting.oura_sleep_awakenings AS
+WITH slots AS (
+    SELECT
+        sp.id,
+        sp.day,
+        sp.data->>'type'                            AS sleep_type,
+        sp.bedtime_start,
+        (sp.data->>'bedtime_start')::timestamp      AS bedtime_start_local,
+        s.phase,
+        s.idx::int                                  AS idx
+    FROM oura.sleep_periods sp
+    CROSS JOIN LATERAL regexp_split_to_table(sp.data->>'sleep_phase_5_min', '')
+        WITH ORDINALITY AS s(phase, idx)
+),
+bounds AS (
+    SELECT
+        id,
+        min(idx) FILTER (WHERE phase <> '4') AS first_sleep_idx,
+        max(idx) FILTER (WHERE phase <> '4') AS last_sleep_idx
+    FROM slots
+    GROUP BY id
+),
+awake AS (
+    -- Gaps-and-islands: consecutive awake slots share the same idx - row_number.
+    SELECT
+        s.*,
+        b.first_sleep_idx,
+        s.idx - row_number() OVER (PARTITION BY s.id ORDER BY s.idx) AS run_id
+    FROM slots s
+    JOIN bounds b USING (id)
+    WHERE s.phase = '4'
+      AND s.idx > b.first_sleep_idx
+      AND s.idx < b.last_sleep_idx
+)
+SELECT
+    id                                                              AS sleep_period_id,
+    day,
+    sleep_type,
+    row_number() OVER (PARTITION BY id ORDER BY min(idx))::int      AS awakening_number,
+    bedtime_start + (min(idx) - 1) * interval '5 minutes'           AS start_time,
+    bedtime_start + max(idx) * interval '5 minutes'                 AS end_time,
+    bedtime_start_local + (min(idx) - 1) * interval '5 minutes'     AS start_time_local,
+    bedtime_start_local + max(idx) * interval '5 minutes'           AS end_time_local,
+    (count(*) * 5)::int                                             AS duration_minutes,
+    ((min(idx) - first_sleep_idx) * 5)::int                         AS minutes_after_sleep_onset
+FROM awake
+GROUP BY id, day, sleep_type, bedtime_start, bedtime_start_local, first_sleep_idx, run_id;
 
 CREATE OR REPLACE VIEW reporting.oura_daily_stress AS
 SELECT
